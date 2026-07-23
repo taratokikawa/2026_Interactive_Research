@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Button } from 'react-native';
 import { useRouter } from 'expo-router';
 import CoinDisplay from '../components/CoinDisplay';
+import MiniLeaderboard from '../components/MiniLeaderboard';
 
 export default function PracticeHub() {
   const router = useRouter();
@@ -26,8 +27,7 @@ export default function PracticeHub() {
       </View>
 
       <Text style={styles.title}>Leaderboard</Text>
-      <Button title="Coming Soon" onPress={() => {}} />
-
+        <MiniLeaderboard />
       <Text style={styles.title}>Profile</Text>
       <CoinDisplay />
     </View>

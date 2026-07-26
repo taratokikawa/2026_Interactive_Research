@@ -109,8 +109,8 @@ export default function Shop() {
     );
   }
 
-  const shirts = items.filter((i) => i.type === 'shirt');
-  const hats = items.filter((i) => i.type === 'hat');
+  const shirts = items.filter((i) => i.type === 'shirt').sort((a, b) => a.price - b.price);
+  const hats = items.filter((i) => i.type === 'hat').sort((a, b) => a.price - b.price);
 
   const renderItem = (item: ShopItem) => {
     const owned = ownedIds.includes(item.id);

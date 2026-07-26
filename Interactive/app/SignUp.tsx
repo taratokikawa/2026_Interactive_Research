@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 
@@ -31,13 +31,14 @@ export default function SignUp() {
 
   return (
     <View style={styles.container}>
-      <Text>Sign Up</Text>
+      <Text style={styles.title}>Sign Up</Text>
       <TextInput
         style={styles.input}
         placeholder="Username"
         value={username}
         onChangeText={setUsername}
         autoCapitalize="none"
+        placeholderTextColor="#A7C7E7"
       />
       <TextInput
         style={styles.input}
@@ -46,6 +47,7 @@ export default function SignUp() {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        placeholderTextColor="#A7C7E7"
       />
       <TextInput
         style={styles.input}
@@ -53,28 +55,57 @@ export default function SignUp() {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        placeholderTextColor="#A7C7E7"
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button title="Sign Up" onPress={handleSignUp} />
+       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+        <Text style={styles.buttonText}>SIGN UP</Text>
+      </TouchableOpacity>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFE787',
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  title: {
+    color: 'white',
+    fontSize: 60,
+    fontWeight: 'bold',
+    marginBottom: 30,
+  },
+
   input: {
     borderWidth: 1,
-    width: 200,
-    margin: 10,
-    padding: 8,
+    borderColor: '#ccc',
+    width: '80%',
+    padding: 12,
+    marginVertical: 10,
+    backgroundColor: 'white',
+    borderRadius: 8,
   },
+
   error: {
     color: 'red',
     marginBottom: 10,
+  },
+
+  button: {
+    backgroundColor: '#A7C7E7',
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    borderRadius: 8,
+    marginTop: 15,
+  },
+
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });

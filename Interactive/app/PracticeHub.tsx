@@ -37,13 +37,15 @@ export default function PracticeHub() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFE787',
     alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: 40,
+    color: 'white',
     marginVertical: 20,
+    fontWeight: 'bold',
   },
   row: {
     flexDirection: 'row',

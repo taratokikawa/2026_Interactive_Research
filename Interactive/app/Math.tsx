@@ -1,6 +1,17 @@
 import { useEffect, useState } from 'react';
+<<<<<<< HEAD
 import { StyleSheet, Text, View, Button, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+=======
+import {
+  StyleSheet,
+  Text,
+  View,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+>>>>>>> dd5a96f (colored practice hub)
 import { supabase } from '../lib/supabase';
 import CoinDisplay from '../components/CoinDisplay';
 
@@ -114,7 +125,12 @@ export default function MathScreen() {
   };
 
   const handleSelect = async (letter: string) => {
+<<<<<<< HEAD
     if (answered || wrongChoices.includes(letter) || !problem) return;
+=======
+    if (selected) return;
+    setSelected(letter);
+>>>>>>> dd5a96f (colored practice hub)
 
     if (letter === problem.correct_answer) {
       setWasCorrect(true);
@@ -166,7 +182,7 @@ export default function MathScreen() {
     );
   }
 
-  const choices: { letter: string; text: string }[] = [
+  const choices = [
     { letter: 'a', text: problem.choice_a },
     { letter: 'b', text: problem.choice_b },
     { letter: 'c', text: problem.choice_c },
@@ -182,6 +198,7 @@ export default function MathScreen() {
 
       <Text style={styles.question}>{problem.question}</Text>
 
+<<<<<<< HEAD
       {choices.map((choice) => (
         <Button
           key={choice.letter}
@@ -190,6 +207,31 @@ export default function MathScreen() {
           disabled={answered || wrongChoices.includes(choice.letter)}
         />
       ))}
+=======
+      {choices.map((choice) => {
+        const isCorrect = choice.letter === problem.correct_answer;
+        const isSelected = choice.letter === selected;
+
+        let backgroundColor = '#4DA8DA'; // default blue
+
+        if (selected) {
+          if (isCorrect) backgroundColor = '#4CAF50'; // green
+          else if (isSelected) backgroundColor = '#F44336'; // red
+          else backgroundColor = '#ccc'; // gray
+        }
+
+        return (
+          <TouchableOpacity
+            key={choice.letter}
+            style={[styles.choiceButton, { backgroundColor }]}
+            onPress={() => handleSelect(choice.letter)}
+            disabled={!!selected}
+          >
+            <Text style={styles.choiceText}>{choice.text}</Text>
+          </TouchableOpacity>
+        );
+      })}
+>>>>>>> dd5a96f (colored practice hub)
 
       {!answered && wrongChoices.length === 1 && (
         <Text style={styles.wrong}>Incorrect, try again!</Text>
@@ -197,11 +239,27 @@ export default function MathScreen() {
 
       {answered && (
         <>
+<<<<<<< HEAD
           <Text style={wasCorrect ? styles.correct : styles.wrong}>
             {wasCorrect ? 'Correct!' : `Wrong! The correct answer was ${problem.correct_answer.toUpperCase()}.`}
           </Text>
           <Text style={styles.explanation}>{problem.explanation}</Text>
           <Button title="Next" onPress={fetchProblem} />
+=======
+          <Text
+            style={
+              selected === problem.correct_answer
+                ? styles.correct
+                : styles.wrong
+            }
+          >
+            {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
+          </Text>
+
+          <Text style={styles.explanation}>
+            {problem.explanation}
+          </Text>
+>>>>>>> dd5a96f (colored practice hub)
         </>
       )}
     </View>
@@ -211,32 +269,54 @@ export default function MathScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFE787',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
     padding: 20,
   },
+
   question: {
-    fontSize: 18,
-    marginBottom: 10,
+    fontSize: 20,
+    marginBottom: 15,
     textAlign: 'center',
+    color: '#white',
+    fontWeight: '600',
   },
+
+  choiceButton: {
+    width: '70%',
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    backgroundColor: '#A7C7E7',
+    marginVertical: 6,
+  },
+
+  choiceText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
   correct: {
     color: 'green',
-    fontSize: 16,
-    marginTop: 10,
+    fontSize: 18,
+    marginTop: 12,
+    fontWeight: 'bold',
   },
+
   wrong: {
     color: 'red',
-    fontSize: 16,
-    marginTop: 10,
+    fontSize: 18,
+    marginTop: 12,
+    fontWeight: 'bold',
   },
+
   explanation: {
     fontSize: 14,
-    marginTop: 6,
+    marginTop: 8,
     textAlign: 'center',
-    color: '#333',
+    color: '#white',
   },
   progress: {
     position: 'absolute',

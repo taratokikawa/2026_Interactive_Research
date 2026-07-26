@@ -28,6 +28,7 @@ export default function EnglishScreen() {
   const [wrongChoices, setWrongChoices] = useState<string[]>([]);
   const [answered, setAnswered] = useState(false);
   const [wasCorrect, setWasCorrect] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
   const [coinRefresh, setCoinRefresh] = useState(0);
   const router = useRouter();
   const [completedCount, setCompletedCount] = useState(0);
@@ -118,34 +119,28 @@ export default function EnglishScreen() {
 };
 
   const handleSelect = async (letter: string) => {
-    if (answered || wrongChoices.includes(letter) || !problem) return;
+    if (selected) return; // lock after first try
+    setSelected(letter);
+    setAnswered(true);
 
-    if (letter === problem.correct_answer) {
+    if (problem && letter === problem.correct_answer) {
       setWasCorrect(true);
-      setAnswered(true);
-      setCompletedCount((prev) => prev + 1);
-
+      const amount = COIN_VALUES[difficulty] ?? 0;
+      await supabase.rpc('increment_coins', { amount });
+      setCoinRefresh((prev) => prev + 1);
+      // mark as completed in DB
       const { data: userData } = await supabase.auth.getUser();
       if (userData.user) {
         await supabase.from('completed_questions').insert({
           user_id: userData.user.id,
-          subject: 'english',
           question_id: problem.id,
+          subject: 'english',
         });
-
-        const amount = COIN_VALUES[difficulty] ?? 0;
-        await supabase.rpc('increment_coins', { amount });
-        setCoinRefresh((prev) => prev + 1);
+        setCompletedCount((c) => c + 1);
       }
-      return;
-    }
-
-    const newWrongChoices = [...wrongChoices, letter];
-    setWrongChoices(newWrongChoices);
-
-    if (newWrongChoices.length >= 2) {
+    } else {
       setWasCorrect(false);
-      setAnswered(true);
+      setWrongChoices((prev) => [...prev, letter]);
     }
   };
 
@@ -166,7 +161,7 @@ export default function EnglishScreen() {
     );
   }
 
-  const choices: { letter: string; text: string }[] = [
+  const choices = [
     { letter: 'a', text: problem.choice_a },
     { letter: 'b', text: problem.choice_b },
     { letter: 'c', text: problem.choice_c },
@@ -187,7 +182,7 @@ export default function EnglishScreen() {
           key={choice.letter}
           title={choice.text}
           onPress={() => handleSelect(choice.letter)}
-          disabled={answered || wrongChoices.includes(choice.letter)}
+          disabled={!!selected}
         />
       ))}
 
@@ -197,11 +192,10 @@ export default function EnglishScreen() {
 
       {answered && (
         <>
-          <Text style={wasCorrect ? styles.correct : styles.wrong}>
-            {wasCorrect ? 'Correct!' : `Wrong! The correct answer was ${problem.correct_answer.toUpperCase()}.`}
+          <Text style={selected === problem.correct_answer ? styles.correct : styles.wrong}>
+            {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
           </Text>
           <Text style={styles.explanation}>{problem.explanation}</Text>
-          <Button title="Next" onPress={fetchProblem} />
         </>
       )}
     </View>
@@ -211,30 +205,51 @@ export default function EnglishScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFE787',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
     padding: 20,
   },
+
   question: {
-    fontSize: 18,
-    marginBottom: 10,
+    fontSize: 22, // 🔥 bigger title
+    marginBottom: 15,
     textAlign: 'center',
+    color: '#222',
+    fontWeight: '600',
   },
+
+  choiceButton: {
+    width: '70%',
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginVertical: 6,
+  },
+
+  choiceText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
   correct: {
     color: 'green',
-    fontSize: 16,
-    marginTop: 10,
+    fontSize: 18,
+    marginTop: 12,
+    fontWeight: 'bold',
   },
+
   wrong: {
     color: 'red',
-    fontSize: 16,
-    marginTop: 10,
+    fontSize: 18,
+    marginTop: 12,
+    fontWeight: 'bold',
   },
+
   explanation: {
     fontSize: 14,
-    marginTop: 6,
+    marginTop: 8,
     textAlign: 'center',
     color: '#333',
   },

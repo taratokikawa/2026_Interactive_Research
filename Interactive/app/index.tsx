@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 
 export default function Home() {
@@ -6,21 +6,26 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Duck Practice</Text>
-            <View style={styles.button}>
-        <Button 
-          title="Login" 
-          color="#A7C7E7"
-          onPress={() => router.push('/Login')} 
-        />
-      </View>
+      <View style={styles.row}>
+        <View style={styles.column}>
+          <Text style={styles.title}>Duck Practice</Text>
 
-      <View style={styles.button}>
-        <Button 
-          title="Sign Up" 
-          color="#A7C7E7"
-          onPress={() => router.push('/SignUp')} 
-        />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => router.push('/Login')}
+          >
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => router.push('/SignUp')}
+          >
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Image source={require('../assets/items/duck.png')} style={styles.duck} />
       </View>
     </View>
   );
@@ -33,14 +38,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#FFE787',
   },
-    title: {
-    color: 'white', // 
-    fontSize: 50,     // 
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  column: {
+    alignItems: 'center',
+  },
+  title: {
+    color: 'white',
+    fontSize: 100,
     fontWeight: 'bold',
     marginBottom: 20,
   },
-   button: {
-    marginVertical: 10, //
-    width: 150, // optional: 
+  button: {
+    marginVertical: 10,
+    height: 90,
+    width: 300,
+    backgroundColor: '#A7C7E7',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 30,
+  },
+  duck: {
+    width: 350,
+    height: 350,
+    resizeMode: 'contain',
   },
 });

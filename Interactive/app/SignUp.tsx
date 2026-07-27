@@ -40,11 +40,13 @@ export default function SignUp() {
           <Text style={styles.modalText}>
             Please do not include any identifiable information (like your real name) in your username.
           </Text>
-          <Button title="Continue" onPress={() => setShowWarning(false)} />
+          <TouchableOpacity style={styles.button} onPress={() => setShowWarning(false)}>
+            <Text style={styles.buttonText}>Continue</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
-      <Text>Sign Up</Text>
+      <Text style={styles.title}>Sign Up</Text>
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -63,7 +65,7 @@ export default function SignUp() {
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>SIGN UP</Text>
+        <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
     </View>
   );
@@ -78,7 +80,7 @@ const styles = StyleSheet.create({
 
   title: {
     color: 'white',
-    fontSize: 60,
+    fontSize: 100,
     fontWeight: 'bold',
     marginBottom: 30,
   },
@@ -86,11 +88,12 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    width: '80%',
-    padding: 12,
+    width: '30%',
+    padding: 20,
     marginVertical: 10,
     backgroundColor: 'white',
     borderRadius: 8,
+    fontSize: 30,
   },
 
   error: {
@@ -100,7 +103,7 @@ const styles = StyleSheet.create({
 
   button: {
     backgroundColor: '#A7C7E7',
-    paddingVertical: 12,
+    paddingVertical: 20,
     paddingHorizontal: 40,
     borderRadius: 8,
     marginTop: 15,
@@ -108,8 +111,7 @@ const styles = StyleSheet.create({
 
   buttonText: {
     color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 25,
     textAlign: 'center',
   },
   modalOverlay: {
@@ -120,19 +122,19 @@ const styles = StyleSheet.create({
 },
 modalBox: {
   backgroundColor: '#fff',
-  padding: 20,
+  padding: 40,
   borderRadius: 8,
-  width: 280,
+  width: "40%",
   alignItems: 'center',
 },
 modalTitle: {
   fontWeight: 'bold',
-  fontSize: 16,
-  marginBottom: 10,
+  fontSize: 25,
+  marginBottom: 15,
   textAlign: 'center',
 },
 modalText: {
+  marginBottom: 10,
   textAlign: 'center',
-  marginBottom: 15,
 },
 });

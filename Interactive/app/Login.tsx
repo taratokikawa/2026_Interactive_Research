@@ -54,7 +54,7 @@ export default function Login() {
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>LOGIN</Text>
+        <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
     </View>
   );
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   },
    title: {
     color: 'white',
-    fontSize: 60,
+    fontSize: 100,
     fontWeight: 'bold',
     marginBottom: 30,
   },
@@ -77,11 +77,12 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    width: '80%',
-    padding: 12,
+    width: '30%',
+    padding: 20,
     marginVertical: 10,
     backgroundColor: 'white',
     borderRadius: 8,
+    fontSize: 30,
   },
 
   error: {
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
 
   button: {
     backgroundColor: '#A7C7E7',
-    paddingVertical: 12,
+    paddingVertical: 20,
     paddingHorizontal: 40,
     borderRadius: 8,
     marginTop: 15,
@@ -99,8 +100,7 @@ const styles = StyleSheet.create({
 
   buttonText: {
     color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 25,
     textAlign: 'center',
   },
 });

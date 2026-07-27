@@ -1,17 +1,13 @@
 import { useEffect, useState } from 'react';
-<<<<<<< HEAD
-import { StyleSheet, Text, View, Button, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-=======
 import {
   StyleSheet,
   Text,
   View,
   ActivityIndicator,
   TouchableOpacity,
+  Button,
 } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
->>>>>>> dd5a96f (colored practice hub)
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import CoinDisplay from '../components/CoinDisplay';
 
@@ -40,6 +36,7 @@ export default function MathScreen() {
   const [wrongChoices, setWrongChoices] = useState<string[]>([]);
   const [answered, setAnswered] = useState(false);
   const [wasCorrect, setWasCorrect] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
   const [coinRefresh, setCoinRefresh] = useState(0);
   const [completedCount, setCompletedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
@@ -53,6 +50,7 @@ export default function MathScreen() {
     setWrongChoices([]);
     setAnswered(false);
     setWasCorrect(false);
+    setSelected(null);
 
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
@@ -125,14 +123,10 @@ export default function MathScreen() {
   };
 
   const handleSelect = async (letter: string) => {
-<<<<<<< HEAD
     if (answered || wrongChoices.includes(letter) || !problem) return;
-=======
-    if (selected) return;
-    setSelected(letter);
->>>>>>> dd5a96f (colored practice hub)
 
     if (letter === problem.correct_answer) {
+      setSelected(letter);
       setWasCorrect(true);
       setAnswered(true);
       setCompletedCount((prev) => prev + 1);
@@ -160,6 +154,7 @@ export default function MathScreen() {
     setWrongChoices(newWrongChoices);
 
     if (newWrongChoices.length >= 2) {
+      setSelected(letter);
       setWasCorrect(false);
       setAnswered(true);
     }
@@ -198,26 +193,18 @@ export default function MathScreen() {
 
       <Text style={styles.question}>{problem.question}</Text>
 
-<<<<<<< HEAD
-      {choices.map((choice) => (
-        <Button
-          key={choice.letter}
-          title={choice.text}
-          onPress={() => handleSelect(choice.letter)}
-          disabled={answered || wrongChoices.includes(choice.letter)}
-        />
-      ))}
-=======
       {choices.map((choice) => {
         const isCorrect = choice.letter === problem.correct_answer;
         const isSelected = choice.letter === selected;
 
         let backgroundColor = '#4DA8DA'; // default blue
 
-        if (selected) {
+        if (answered) {
           if (isCorrect) backgroundColor = '#4CAF50'; // green
           else if (isSelected) backgroundColor = '#F44336'; // red
           else backgroundColor = '#ccc'; // gray
+        } else if (wrongChoices.includes(choice.letter)) {
+          backgroundColor = '#ccc'; // gray out previously wrong picks, but don't reveal correct one yet
         }
 
         return (
@@ -225,13 +212,12 @@ export default function MathScreen() {
             key={choice.letter}
             style={[styles.choiceButton, { backgroundColor }]}
             onPress={() => handleSelect(choice.letter)}
-            disabled={!!selected}
+            disabled={answered || wrongChoices.includes(choice.letter)}
           >
             <Text style={styles.choiceText}>{choice.text}</Text>
           </TouchableOpacity>
         );
       })}
->>>>>>> dd5a96f (colored practice hub)
 
       {!answered && wrongChoices.length === 1 && (
         <Text style={styles.wrong}>Incorrect, try again!</Text>
@@ -239,13 +225,6 @@ export default function MathScreen() {
 
       {answered && (
         <>
-<<<<<<< HEAD
-          <Text style={wasCorrect ? styles.correct : styles.wrong}>
-            {wasCorrect ? 'Correct!' : `Wrong! The correct answer was ${problem.correct_answer.toUpperCase()}.`}
-          </Text>
-          <Text style={styles.explanation}>{problem.explanation}</Text>
-          <Button title="Next" onPress={fetchProblem} />
-=======
           <Text
             style={
               selected === problem.correct_answer
@@ -259,7 +238,10 @@ export default function MathScreen() {
           <Text style={styles.explanation}>
             {problem.explanation}
           </Text>
->>>>>>> dd5a96f (colored practice hub)
+
+          <TouchableOpacity style={styles.continueButton} onPress={fetchProblem}>
+            <Text style={styles.buttonText}>Continue</Text>
+          </TouchableOpacity>
         </>
       )}
     </View>
@@ -323,6 +305,17 @@ const styles = StyleSheet.create({
     top: 65,
     right: 20,
     fontSize: 14,
+    fontWeight: 'bold',
+  },
+  continueButton: {
+    marginTop: 12,
+    backgroundColor: '#A7C7E7',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: '#fff',
     fontWeight: 'bold',
   },
 });

@@ -15,7 +15,7 @@ const WORN_IMAGES: Record<string, any> = {
 
 const BASE_AVATAR = require('../assets/items/duck.png');
 
-export default function AvatarPreview({ refreshKey }: { refreshKey?: number }) {
+export default function AvatarPreview({ refreshKey, size = 120 }: { refreshKey?: number; size?: number }) {
   const [shirtKey, setShirtKey] = useState<string | null>(null);
   const [hatKey, setHatKey] = useState<string | null>(null);
 
@@ -59,13 +59,13 @@ export default function AvatarPreview({ refreshKey }: { refreshKey?: number }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={BASE_AVATAR} style={styles.layer} />
+    <View style={[styles.container, { width: size, height: size }]}>
+      <Image source={BASE_AVATAR} style={[styles.layer, { width: size, height: size }]} />
       {shirtKey && WORN_IMAGES[shirtKey] && (
-        <Image source={WORN_IMAGES[shirtKey]} style={styles.layer} />
+        <Image source={WORN_IMAGES[shirtKey]} style={[styles.layer, { width: size, height: size }]} />
       )}
       {hatKey && WORN_IMAGES[hatKey] && (
-        <Image source={WORN_IMAGES[hatKey]} style={styles.layer} />
+        <Image source={WORN_IMAGES[hatKey]} style={[styles.layer, { width: size, height: size }]} />
       )}
     </View>
   );
@@ -73,13 +73,13 @@ export default function AvatarPreview({ refreshKey }: { refreshKey?: number }) {
 
 const styles = StyleSheet.create({
   container: {
-    width: 120,
-    height: 120,
+    width: 300,
+    height: 300,
     position: 'relative',
   },
   layer: {
     position: 'absolute',
-    width: 120,
-    height: 120,
+    width: 300,
+    height: 300,
   },
 });

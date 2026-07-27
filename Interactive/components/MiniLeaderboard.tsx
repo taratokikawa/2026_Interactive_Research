@@ -2,11 +2,14 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
+import MiniAvatar from './MiniAvatar';
 
 type LeaderboardEntry = {
   username: string;
   coins: number;
   questions_correct: number;
+  shirt_worn_image_key: string | null;
+  hat_worn_image_key: string | null;
 };
 
 export default function MiniLeaderboard() {
@@ -37,9 +40,9 @@ export default function MiniLeaderboard() {
       {entries.map((entry, index) => (
         <View key={index} style={styles.row}>
           <Text style={styles.rank}>{index + 1}.</Text>
+            <MiniAvatar shirtKey={entry.shirt_worn_image_key} hatKey={entry.hat_worn_image_key} size={75} />
           <Text style={styles.username}>{entry.username}</Text>
-          <Text>{entry.questions_correct} correct | </Text>
-          <Text>Coins: {entry.coins}</Text>
+          <Text style={styles.subtext}>{entry.questions_correct} correct | Coins: {entry.coins}</Text>
         </View>
       ))}
     </TouchableOpacity>
@@ -48,11 +51,10 @@ export default function MiniLeaderboard() {
 
 const styles = StyleSheet.create({
   container: {
-    borderWidth: 1,
-    borderColor: '#ccc',
+    backgroundColor: '#fff',
     borderRadius: 8,
     padding: 10,
-    width: 250,
+    width: 625,
   },
   row: {
     flexDirection: 'row',
@@ -61,9 +63,20 @@ const styles = StyleSheet.create({
   },
   rank: {
     fontWeight: 'bold',
+    fontSize: 50,
+    marginLeft: 15,
+    marginRight: 5,
   },
   username: {
     flex: 1,
+    paddingTop: 8,
+    fontSize: 40,
     marginLeft: 8,
+  },
+  subtext: {
+    paddingTop: 18,
+    marginRight: 15,
+    fontSize: 30,
+    color: '#666',
   },
 });

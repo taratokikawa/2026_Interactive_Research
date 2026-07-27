@@ -33,7 +33,6 @@ export default function Shop() {
   const [avatarRefresh, setAvatarRefresh] = useState(0);
   const [equippedShirtId, setEquippedShirtId] = useState<string | null>(null);
   const [equippedHatId, setEquippedHatId] = useState<string | null>(null);
-  
 
   useEffect(() => {
     fetchShopData();
@@ -51,10 +50,10 @@ export default function Shop() {
       .select('item_id')
       .eq('user_id', userData.user.id);
     const { data: avatar } = await supabase
-    .from('user_avatar')
-    .select('equipped_shirt, equipped_hat')
-    .eq('user_id', userData.user.id)
-    .single();
+      .from('user_avatar')
+      .select('equipped_shirt, equipped_hat')
+      .eq('user_id', userData.user.id)
+      .single();
 
     setEquippedShirtId(avatar?.equipped_shirt ?? null);
     setEquippedHatId(avatar?.equipped_hat ?? null);
@@ -119,14 +118,14 @@ export default function Shop() {
       (item.type === 'hat' && equippedHatId === item.id);
 
     return (
-      <View key={item.id} style={styles.itemBox}>
+      <View key={item.id} style={styles.inventoryItem}>
         {PREVIEW_IMAGES[item.preview_image_key] ? (
           <Image source={PREVIEW_IMAGES[item.preview_image_key]} style={styles.itemImage} />
         ) : (
           <View style={styles.placeholderImage} />
         )}
-        <Text>{item.name}</Text>
-        <Text>{item.price} coins</Text>
+        <Text style={styles.itemName}>{item.name}</Text>
+        <Text style={styles.itemPrice}>{item.price} coins</Text>
         {owned ? (
           <TouchableOpacity style={styles.button} onPress={() => handleEquip(item)}>
             <Text style={styles.buttonText}>{isEquipped ? 'Unequip' : 'Equip'}</Text>
@@ -142,75 +141,182 @@ export default function Shop() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <CoinDisplay refreshKey={coinRefresh} />
       <Text style={styles.title}>Shop</Text>
+
 
       {message ? <Text style={styles.message}>{message}</Text> : null}
 
-      <Text style={styles.sectionTitle}>Shirts</Text>
-      <View style={styles.row}>{shirts.map(renderItem)}</View>
+      <View style={styles.shopMainRow}>
+        <View style={styles.itemsColumn}>
+          <Text style={styles.sectionTitle}>Shirts</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.inventoryScroll}>
+            <View style={styles.inventoryList}>{shirts.map(renderItem)}</View>
+          </ScrollView>
 
-      <Text style={styles.sectionTitle}>Hats</Text>
-      <View style={styles.row}>{hats.map(renderItem)}</View>
-      <AvatarPreview refreshKey={avatarRefresh} />
+          <Text style={styles.sectionTitle}>Hats</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.inventoryScroll}>
+            <View style={styles.inventoryList}>{hats.map(renderItem)}</View>
+          </ScrollView>
+        </View>
+
+        <View style={styles.avatarColumn}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+            <CoinDisplay refreshKey={coinRefresh} fontSize={50} />
+          </View>
+          <AvatarPreview refreshKey={avatarRefresh} size={500} />
+        </View>
+      </View>
     </ScrollView>
-    
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
+    backgroundColor: '#FFE787',
+    alignItems: 'stretch',
+    justifyContent: 'flex-start',
     padding: 20,
   },
+  shopMainRow: {
+    flexDirection: 'row',
+    width: '100%',
+    alignItems: 'flex-start',
+  },
+  itemsColumn: {
+    marginLeft: 50,
+    flex: 0.7,
+  },
+  avatarColumn: {
+    marginTop: 100,
+    flex: 0.4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  difficultyRow: {
+    flexDirection: 'row',
+    width: '100%',
+    gap: 20,
+    marginBottom: 20,
+  },
+  fillButton: {
+    backgroundColor: '#A7C7E7',
+    paddingVertical: 30,
+    width: 250,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  leaderboardColumn: {
+    flex: 0.4,
+    alignItems: 'center',
+  },
+  profileColumn: {
+    flex: 0.6,
+    alignItems: 'center',
+  },
+  inventoryScroll: {
+    width: '100%',
+  },
+  bottomRow: {
+    flexDirection: 'row',
+    width: '100%',
+    marginTop: 10,
+  },
+  bottomColumn: {
+    flex: 1,
+    alignItems: 'center',
+  },
   title: {
-    fontSize: 20,
-    marginVertical: 10,
+    fontSize: 80,
+    color: 'white',
+    marginVertical: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    width: '100%',
   },
   sectionTitle: {
-    fontSize: 16,
-    marginTop: 20,
+    fontSize: 50,
+    fontWeight: 'bold',
+    color: 'white',
     marginBottom: 10,
+    textAlign: 'left',
+    width: '100%',
   },
   row: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 12,
+    justifyContent: 'space-around',
+    width: '100%',
+    marginVertical: 25,
   },
-  itemBox: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
+  column: {
     alignItems: 'center',
-    width: 100,
-  },
-  itemImage: {
-    width: 90,
-    height: 50,
-    marginBottom: 6,
-  },
-  placeholderImage: {
-    width: 90,
-    height: 50,
-    marginBottom: 6,
-    backgroundColor: '#eee',
   },
   button: {
-    marginTop: 6,
-    backgroundColor: '#0071BC',
-    paddingVertical: 4,
-    paddingHorizontal: 10,
+    backgroundColor: '#A7C7E7',
+    paddingVertical: 10,
     borderRadius: 6,
+    marginVertical: 5,
+    width: 200,
+    alignItems: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: 'white',
+    fontSize: 50,
+  },
+  shopRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginVertical: 10,
+    width: '95%',
+  },
+  shopButton: {
+    backgroundColor: '#A7C7E7',
+    paddingVertical: 10,
+    borderRadius: 6,
+    width: 100,
+    alignItems: 'center',
+    marginLeft: 20,
+  },
+  shopButtonText: {
+    color: 'white',
+    fontSize: 20,
+  },
+  inventoryList: {
+    flexDirection: 'row',
+    gap: 15,
+  },
+  inventoryItem: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 8,
+    alignItems: 'center',
+    width: 250,
+    height: 285,
+  },
+  itemImage: {
+    width: 160,
+    height: 80,
+    marginVertical: 8,
+  },
+  placeholderImage: {
+    width: 160,
+    height: 80,
+    marginVertical: 8,
+    backgroundColor: '#eee',
   },
   message: {
     marginBottom: 10,
     color: '#333',
+    textAlign: 'center',
+  },
+  itemName: {
+    fontSize: 30,
+    marginBottom: 4,
+  },
+  itemPrice: {
+    fontSize: 20,
+    color: '#666',
+    marginBottom: 8,
   },
 });

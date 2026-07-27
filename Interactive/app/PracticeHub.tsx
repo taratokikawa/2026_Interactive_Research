@@ -1,10 +1,11 @@
-import { StyleSheet, Text, View, Button, Image, TouchableOpacity, } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, TouchableOpacity, ScrollView} from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import CoinDisplay from '../components/CoinDisplay';
 import MiniLeaderboard from '../components/MiniLeaderboard';
 import AvatarPreview from '../components/AvatarPreview';
 import { supabase } from '../lib/supabase';
+import CorrectCountDisplay from '../components/CorrectCountDisplay';
 
 
 export default function PracticeHub() {
@@ -86,127 +87,182 @@ export default function PracticeHub() {
 
   return (
     <View style={styles.container}>
-      
       <Text style={styles.title}>Practice Hub</Text>
 
+      {/* Math + English side by side */}
       <View style={styles.row}>
-        {/* Math Section */}
         <View style={styles.column}>
           <Text style={styles.sectionTitle}>Math</Text>
+          <View style={styles.difficultyRow}>
+            <TouchableOpacity
+              style={styles.fillButton}
+              onPress={() => router.push('/Math?difficulty=easy')}
+            >
+              <Text style={styles.buttonText}>EASY</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.push('/Math?difficulty=easy')}
-          >
-            <Text style={styles.buttonText}>EASY</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.fillButton}
+              onPress={() => router.push('/Math?difficulty=medium')}
+            >
+              <Text style={styles.buttonText}>MEDIUM</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.push('/Math?difficulty=medium')}
-          >
-            <Text style={styles.buttonText}>MEDIUM</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.push('/Math?difficulty=hard')}
-          >
-            <Text style={styles.buttonText}>HARD</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.fillButton}
+              onPress={() => router.push('/Math?difficulty=hard')}
+            >
+              <Text style={styles.buttonText}>HARD</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {/* English Section */}
         <View style={styles.column}>
           <Text style={styles.sectionTitle}>English</Text>
+          <View style={styles.difficultyRow}>
+            <TouchableOpacity
+              style={styles.fillButton}
+              onPress={() => router.push('/English?difficulty=easy')}
+            >
+              <Text style={styles.buttonText}>EASY</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.push('/English?difficulty=easy')}
-          >
-            <Text style={styles.buttonText}>EASY</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.fillButton}
+              onPress={() => router.push('/English?difficulty=medium')}
+            >
+              <Text style={styles.buttonText}>MEDIUM</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.push('/English?difficulty=medium')}
-          >
-            <Text style={styles.buttonText}>MEDIUM</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.push('/English?difficulty=hard')}
-          >
-            <Text style={styles.buttonText}>HARD</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.fillButton}
+              onPress={() => router.push('/English?difficulty=hard')}
+            >
+              <Text style={styles.buttonText}>HARD</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
-      <Text style={styles.title}>Leaderboard</Text>
-              <MiniLeaderboard />
+      {/* Leaderboard + Profile side by side */}
+      <View style={styles.bottomRow}>
+        <View style={styles.leaderboardColumn}>
+          <Text style={styles.title}>Leaderboard</Text>
+          <MiniLeaderboard />
+        </View>
 
-      <Text style={styles.title}>Profile</Text>
-      <CoinDisplay />
+        <View style={styles.profileColumn}>
+          <Text style={styles.title}>Profile</Text>
+          <View style={styles.shopRow}>
+            <CorrectCountDisplay refreshKey={avatarRefresh} />
+              <Text style={{ fontSize: 20, marginVertical: 10}}> | </Text>
+              <CoinDisplay />
+            <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/Shop')}>
+              <Text style={styles.shopButtonText}>Shop</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.row}>
+            <View style={styles.avatar}>
+               <AvatarPreview refreshKey={avatarRefresh} size={350} />
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={true} style={styles.inventoryScroll}>
+            <View style={styles.inventoryList}>
+              {inventoryItems.map((item) => {
+                const isEquipped =
+                  (item.type === 'shirt' && equippedShirtId === item.id) ||
+                  (item.type === 'hat' && equippedHatId === item.id);
 
-      <View style={styles.row}>
-        <AvatarPreview refreshKey={avatarRefresh} />
-
-        <View style={styles.inventoryList}>
-          {inventoryItems.map((item) => {
-            const isEquipped =
-              (item.type === 'shirt' && equippedShirtId === item.id) ||
-              (item.type === 'hat' && equippedHatId === item.id);
-
-            return (
-              <View key={item.id} style={styles.inventoryItem}>
-                {PREVIEW_IMAGES[item.preview_image_key] ? (
-                  <Image source={PREVIEW_IMAGES[item.preview_image_key]} style={styles.itemImage} />
-                ) : (
-                  <View style={styles.placeholderImage} />
-                )}
-                <Text>{item.name}</Text>
-                <TouchableOpacity style={styles.button} onPress={() => handleEquip(item)}>
-                  <Text style={styles.buttonText}>{isEquipped ? 'Unequip' : 'Equip'}</Text>
-                </TouchableOpacity>
-              </View>
-            );
-          })}
+                return (
+                  <View key={item.id} style={styles.inventoryItem}>
+                    {PREVIEW_IMAGES[item.preview_image_key] ? (
+                      <Image source={PREVIEW_IMAGES[item.preview_image_key]} style={styles.itemImage} />
+                    ) : (
+                      <View style={styles.placeholderImage} />
+                    )}
+                    <Text>{item.name}</Text>
+                    <TouchableOpacity style={styles.button} onPress={() => handleEquip(item)}>
+                      <Text style={styles.buttonText}>{isEquipped ? 'Unequip' : 'Equip'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+            </View>
+            </ScrollView>
+          </View>
         </View>
       </View>
-
-      <Button title="Shop" onPress={() => router.push('/Shop')} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#FFE787',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  flex: 1,
+  backgroundColor: '#FFE787',
+  alignItems: 'stretch', // changed from 'center'
+  justifyContent: 'flex-start', // changed from 'center'
+  padding: 20,
+},
 
+difficultyRow: {
+  flexDirection: 'row',
+  width: '100%',
+  gap: 20,
+  marginBottom: 20,
+},
+fillButton: {
+  backgroundColor: '#A7C7E7',
+  paddingVertical: 30,
+  width: 250,
+  borderRadius: 20,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+leaderboardColumn: {
+  flex: 0.4,
+  alignItems: 'center',
+},
+profileColumn: {
+  flex: 0.6,
+  alignItems: 'center',
+},
+inventoryScroll: {
+  maxWidth: 600,
+  marginRight: 50,
+},
+bottomRow: {
+  flexDirection: 'row',
+  width: '100%',
+  marginTop: 10,
+},
+
+bottomColumn: {
+  flex: 1,
+  alignItems: 'center',
+},
   title: {
-    fontSize: 40,
-    color: 'white',
-    marginVertical: 20,
-    fontWeight: 'bold',
-  },
+  fontSize: 80,
+  color: 'white',
+  marginVertical: 20,
+  fontWeight: 'bold',
+  textAlign: 'center',
+  width: '100%',
+},
 
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 10,
-  },
+  fontSize: 50,
+  fontWeight: 'bold',
+  color: 'white',
+  marginBottom: 10,
+  textAlign: 'left',
+  width: '100%',
+},
 
   row: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    marginBottom: 20,
+    marginVertical: 25,
   },
 
   column: {
@@ -216,38 +272,58 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#A7C7E7',
     paddingVertical: 10,
-    paddingHorizontal: 25,
     borderRadius: 6,
     marginVertical: 5,
-    minWidth: 100,
+    width: 200,
     alignItems: 'center',
   },
 
   buttonText: {
     color: 'white',
-    fontWeight: 'bold',
+    fontSize: 50,
+  },
+  shopRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginVertical: 10,
+    width: '90%',
+  },
+  shopButton: {
+    backgroundColor: '#A7C7E7',
+    paddingVertical: 10,
+    borderRadius: 6,
+    width: 100,
+    alignItems: 'center',
+    marginLeft: 20,
+  },
+  shopButtonText: {
+    color: 'white',
+    fontSize: 20,
   },
 inventoryList: {
   flexDirection: 'row',
-  gap: 8,
+  gap: 15,
 },
 inventoryItem: {
-  borderWidth: 1,
-  borderColor: '#ccc',
+  backgroundColor: '#fff',
   borderRadius: 8,
   padding: 8,
   alignItems: 'center',
-  width: 90,
+  width: 250,
+  height: 225,
 },
 itemImage: {
-  width: 80,
-  height: 40,
-  marginBottom: 4,
+  width: 160,
+  height: 80,
+  marginVertical: 8,
 },
 placeholderImage: {
-  width: 80,
-  height: 40,
-  marginBottom: 4,
+  width: 160,
+  height: 80,
+  marginVertical: 8,
   backgroundColor: '#eee',
 },
+avatar:{
+  marginTop: -100,
+}
 });

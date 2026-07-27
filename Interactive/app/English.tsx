@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Button, ActivityIndicator } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ActivityIndicator,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import CoinDisplay from '../components/CoinDisplay';
@@ -23,6 +30,7 @@ const COIN_VALUES: Record<string, number> = {
 
 export default function EnglishScreen() {
   const { difficulty } = useLocalSearchParams<{ difficulty: string }>();
+  const router = useRouter();
   const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState(true);
   const [wrongChoices, setWrongChoices] = useState<string[]>([]);
@@ -30,7 +38,6 @@ export default function EnglishScreen() {
   const [wasCorrect, setWasCorrect] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [coinRefresh, setCoinRefresh] = useState(0);
-  const router = useRouter();
   const [completedCount, setCompletedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
 
@@ -39,108 +46,115 @@ export default function EnglishScreen() {
   }, [difficulty]);
 
   const fetchProblem = async () => {
-  setLoading(true);
-  setWrongChoices([]);
-  setAnswered(false);
-  setWasCorrect(false);
+    setLoading(true);
+    setWrongChoices([]);
+    setAnswered(false);
+    setWasCorrect(false);
+    setSelected(null);
 
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) return;
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) return;
 
-  const { data: completed } = await supabase
-    .from('completed_questions')
-    .select('question_id')
-    .eq('user_id', userData.user.id)
-    .eq('subject', 'english');
+    const { data: completed } = await supabase
+      .from('completed_questions')
+      .select('question_id')
+      .eq('user_id', userData.user.id)
+      .eq('subject', 'english');
 
-  const completedIds = completed?.map((c) => c.question_id) ?? [];
+    const completedIds = completed?.map((c) => c.question_id) ?? [];
 
-  // Total questions at this difficulty
-  const { count: total } = await supabase
-    .from('english_problems')
-    .select('*', { count: 'exact', head: true })
-    .eq('difficulty', difficulty);
+    const { count: total } = await supabase
+      .from('english_problems')
+      .select('*', { count: 'exact', head: true })
+      .eq('difficulty', difficulty);
 
-  setTotalCount(total ?? 0);
+    setTotalCount(total ?? 0);
 
-  // Completed count specifically at this difficulty
-  const { data: allAtDifficulty } = await supabase
-    .from('english_problems')
-    .select('id')
-    .eq('difficulty', difficulty);
+    const { data: allAtDifficulty } = await supabase
+      .from('english_problems')
+      .select('id')
+      .eq('difficulty', difficulty);
 
-  const idsAtDifficulty = allAtDifficulty?.map((p) => p.id) ?? [];
-  const completedAtDifficulty = completedIds.filter((id) =>
-    idsAtDifficulty.includes(id)
-  );
-  setCompletedCount(completedAtDifficulty.length);
+    const idsAtDifficulty = allAtDifficulty?.map((p) => p.id) ?? [];
+    const completedAtDifficulty = completedIds.filter((id) =>
+      idsAtDifficulty.includes(id)
+    );
+    setCompletedCount(completedAtDifficulty.length);
 
-  // Exclude the question just shown (if any) so it's not immediately repeated
-  const excludeIds = problem ? [...completedIds, problem.id] : completedIds;
+    const excludeIds = problem ? [...completedIds, problem.id] : completedIds;
 
-  let query = supabase
-    .from('english_problems')
-    .select('*')
-    .eq('difficulty', difficulty);
-
-  if (excludeIds.length > 0) {
-    query = query.not('id', 'in', `(${excludeIds.join(',')})`);
-  }
-
-  const { data, error } = await query;
-
-  if (!error && data && data.length > 0) {
-    // Found a question excluding the current one
-    const randomIndex = Math.floor(Math.random() * data.length);
-    setProblem(data[randomIndex]);
-  } else {
-    // No other options — fall back to allowing the same question again
-    // (only excluding truly completed/correct ones)
-    let fallbackQuery = supabase
+    let query = supabase
       .from('english_problems')
       .select('*')
       .eq('difficulty', difficulty);
 
-    if (completedIds.length > 0) {
-      fallbackQuery = fallbackQuery.not('id', 'in', `(${completedIds.join(',')})`);
+    if (excludeIds.length > 0) {
+      query = query.not('id', 'in', `(${excludeIds.join(',')})`);
     }
 
-    const { data: fallbackData, error: fallbackError } = await fallbackQuery;
+    const { data, error } = await query;
 
-    if (!fallbackError && fallbackData && fallbackData.length > 0) {
-      const randomIndex = Math.floor(Math.random() * fallbackData.length);
-      setProblem(fallbackData[randomIndex]);
+    if (!error && data && data.length > 0) {
+      const randomIndex = Math.floor(Math.random() * data.length);
+      setProblem(data[randomIndex]);
     } else {
-      setProblem(null);
-    }
-  }
+      let fallbackQuery = supabase
+        .from('english_problems')
+        .select('*')
+        .eq('difficulty', difficulty);
 
-  setLoading(false);
-};
+      if (completedIds.length > 0) {
+        fallbackQuery = fallbackQuery.not('id', 'in', `(${completedIds.join(',')})`);
+      }
+
+      const { data: fallbackData, error: fallbackError } = await fallbackQuery;
+
+      if (!fallbackError && fallbackData && fallbackData.length > 0) {
+        const randomIndex = Math.floor(Math.random() * fallbackData.length);
+        setProblem(fallbackData[randomIndex]);
+      } else {
+        setProblem(null);
+      }
+    }
+
+    setLoading(false);
+  };
 
   const handleSelect = async (letter: string) => {
-    if (selected) return; // lock after first try
-    setSelected(letter);
-    setAnswered(true);
+    if (answered || wrongChoices.includes(letter) || !problem) return;
 
-    if (problem && letter === problem.correct_answer) {
+    if (letter === problem.correct_answer) {
+      setSelected(letter);
       setWasCorrect(true);
-      const amount = COIN_VALUES[difficulty] ?? 0;
-      await supabase.rpc('increment_coins', { amount });
-      setCoinRefresh((prev) => prev + 1);
-      // mark as completed in DB
+      setAnswered(true);
+      setCompletedCount((prev) => prev + 1);
+
       const { data: userData } = await supabase.auth.getUser();
       if (userData.user) {
-        await supabase.from('completed_questions').insert({
+        const { error: insertError } = await supabase.from('completed_questions').insert({
           user_id: userData.user.id,
-          question_id: problem.id,
           subject: 'english',
+          question_id: problem.id,
         });
-        setCompletedCount((c) => c + 1);
+
+        if (insertError) {
+          console.error('Insert failed:', insertError.message);
+        }
+
+        const amount = COIN_VALUES[difficulty] ?? 0;
+        await supabase.rpc('increment_coins', { amount });
+        setCoinRefresh((prev) => prev + 1);
       }
-    } else {
+      return;
+    }
+
+    const newWrongChoices = [...wrongChoices, letter];
+    setWrongChoices(newWrongChoices);
+
+    if (newWrongChoices.length >= 2) {
+      setSelected(letter);
       setWasCorrect(false);
-      setWrongChoices((prev) => [...prev, letter]);
+      setAnswered(true);
     }
   };
 
@@ -155,8 +169,10 @@ export default function EnglishScreen() {
   if (!problem) {
     return (
       <View style={styles.container}>
-        <Text>You've completed all {difficulty} questions in this subject!</Text>
-        <Button title="Return to Hub" onPress={() => router.replace('/PracticeHub')} />
+        <Text style={styles.title}>You've completed all {difficulty} questions!</Text>
+        <TouchableOpacity style={styles.continueButton} onPress={() => router.replace('/PracticeHub')}>
+          <Text style={styles.buttonText}>Return to Hub</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -169,95 +185,170 @@ export default function EnglishScreen() {
   ];
 
   return (
-    <View style={styles.container}>
-      <CoinDisplay refreshKey={coinRefresh} />
-      <Text style={styles.progress}>
-        {completedCount} / {totalCount}
-      </Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.topBar}>
+        <CoinDisplay refreshKey={coinRefresh} fontSize={40} />
+        <Text style={styles.progress}>
+          {completedCount} / {totalCount} Questions Completed
+        </Text>
+      </View>
 
-      <Text style={styles.question}>{problem.question}</Text>
+      <View style={styles.mainRow}>
+        <View style={styles.questionColumn}>
+          <Text style={styles.question}>{problem.question}</Text>
+        </View>
 
-      {choices.map((choice) => (
-        <Button
-          key={choice.letter}
-          title={choice.text}
-          onPress={() => handleSelect(choice.letter)}
-          disabled={!!selected}
-        />
-      ))}
+        <View style={styles.choicesColumn}>
+          {choices.map((choice) => {
+            const isCorrect = choice.letter === problem.correct_answer;
+            const isSelected = choice.letter === selected;
 
-      {!answered && wrongChoices.length === 1 && (
-        <Text style={styles.wrong}>Incorrect, try again!</Text>
-      )}
+            let backgroundColor = '#A7C7E7';
 
-      {answered && (
-        <>
-          <Text style={selected === problem.correct_answer ? styles.correct : styles.wrong}>
-            {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
-          </Text>
-          <Text style={styles.explanation}>{problem.explanation}</Text>
-        </>
-      )}
-    </View>
+            if (answered) {
+              if (isCorrect) backgroundColor = '#4CAF50';
+              else if (isSelected) backgroundColor = '#F44336';
+              else backgroundColor = '#ccc';
+            } else if (wrongChoices.includes(choice.letter)) {
+              backgroundColor = '#ccc';
+            }
+
+            return (
+              <TouchableOpacity
+                key={choice.letter}
+                style={[styles.choiceButton, { backgroundColor }]}
+                onPress={() => handleSelect(choice.letter)}
+                disabled={answered || wrongChoices.includes(choice.letter)}
+              >
+                <Text style={styles.choiceText}>{choice.text}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <View style={styles.feedbackColumn}>
+          {!answered && wrongChoices.length === 1 && (
+            <Text style={styles.wrong}>Incorrect, try again!</Text>
+          )}
+
+          {answered && (
+            <>
+              <Text
+                style={
+                  selected === problem.correct_answer
+                    ? styles.correct
+                    : styles.wrong
+                }
+              >
+                {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
+              </Text>
+
+              <Text style={styles.explanation}>{problem.explanation}</Text>
+
+              <TouchableOpacity style={styles.continueButton} onPress={fetchProblem}>
+                <Text style={styles.buttonText}>Continue</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: '#FFE787',
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: 20,
   },
-
-  question: {
-    fontSize: 22, // 🔥 bigger title
-    marginBottom: 15,
-    textAlign: 'center',
-    color: '#222',
-    fontWeight: '600',
-  },
-
-  choiceButton: {
-    width: '70%',
-    padding: 14,
-    borderRadius: 12,
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 6,
+    marginBottom: 20,
   },
-
+  progress: {
+    fontSize: 50,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  title: {
+    fontSize: 40,
+    color: 'white',
+    marginVertical: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    width: '100%',
+  },
+  question: {
+    fontSize: 80,
+    marginVertical: 15,
+    textAlign: 'center',
+  },
+  choiceButton: {
+    width: '48%',
+    minHeight: 100,
+    padding: 14,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#A7C7E7',
+    marginVertical: 10,
+  },
   choiceText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 60,
     fontWeight: 'bold',
+    textAlign: 'center',
+    flexShrink: 1,
   },
-
   correct: {
     color: 'green',
-    fontSize: 18,
+    fontSize: 50,
     marginTop: 12,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
-
   wrong: {
     color: 'red',
-    fontSize: 18,
+    fontSize: 50,
     marginTop: 12,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
-
   explanation: {
-    fontSize: 14,
+    fontSize: 60,
     marginTop: 8,
     textAlign: 'center',
-    color: '#333',
+    color: 'white',
   },
-    progress: {
-    position: 'absolute',
-    top: 65,
-    right: 20,
-    fontSize: 14,
-    fontWeight: 'bold',
+  continueButton: {
+    marginTop: 12,
+    backgroundColor: '#A7C7E7',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 40,
+  },
+  mainRow: {
+    flexDirection: 'column',
+    padding: 30,
+  },
+  questionColumn: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  choicesColumn: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  feedbackColumn: {
+    alignItems: 'center',
+    marginTop: 20,
   },
 });

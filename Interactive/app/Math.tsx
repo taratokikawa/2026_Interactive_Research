@@ -5,7 +5,7 @@ import {
   View,
   ActivityIndicator,
   TouchableOpacity,
-  Button,
+  ScrollView,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
@@ -63,7 +63,6 @@ export default function MathScreen() {
 
     const completedIds = completed?.map((c) => c.question_id) ?? [];
 
-    // Total questions at this difficulty
     const { count: total } = await supabase
       .from('math_problems')
       .select('*', { count: 'exact', head: true })
@@ -71,7 +70,6 @@ export default function MathScreen() {
 
     setTotalCount(total ?? 0);
 
-    // Completed count specifically at this difficulty
     const { data: allAtDifficulty } = await supabase
       .from('math_problems')
       .select('id')
@@ -171,8 +169,10 @@ export default function MathScreen() {
   if (!problem) {
     return (
       <View style={styles.container}>
-        <Text>You've completed all {difficulty} questions in this subject!</Text>
-        <Button title="Return to Hub" onPress={() => router.replace('/PracticeHub')} />
+        <Text style={styles.title}>You've completed all {difficulty} questions!</Text>
+        <TouchableOpacity style={styles.continueButton} onPress={() => router.replace('/PracticeHub')}>
+          <Text style={styles.buttonText}>Return to Hub</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -185,137 +185,170 @@ export default function MathScreen() {
   ];
 
   return (
-    <View style={styles.container}>
-      <CoinDisplay refreshKey={coinRefresh} />
-      <Text style={styles.progress}>
-        {completedCount} / {totalCount}
-      </Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.topBar}>
+        <CoinDisplay refreshKey={coinRefresh} fontSize={40} />
+        <Text style={styles.progress}>
+          {completedCount} / {totalCount} Questions Completed
+        </Text>
+      </View>
 
-      <Text style={styles.question}>{problem.question}</Text>
+      <View style={styles.mainRow}>
+        <View style={styles.questionColumn}>
+          <Text style={styles.question}>{problem.question}</Text>
+        </View>
 
-      {choices.map((choice) => {
-        const isCorrect = choice.letter === problem.correct_answer;
-        const isSelected = choice.letter === selected;
+        <View style={styles.choicesColumn}>
+          {choices.map((choice) => {
+            const isCorrect = choice.letter === problem.correct_answer;
+            const isSelected = choice.letter === selected;
 
-        let backgroundColor = '#4DA8DA'; // default blue
+            let backgroundColor = '#A7C7E7';
 
-        if (answered) {
-          if (isCorrect) backgroundColor = '#4CAF50'; // green
-          else if (isSelected) backgroundColor = '#F44336'; // red
-          else backgroundColor = '#ccc'; // gray
-        } else if (wrongChoices.includes(choice.letter)) {
-          backgroundColor = '#ccc'; // gray out previously wrong picks, but don't reveal correct one yet
-        }
-
-        return (
-          <TouchableOpacity
-            key={choice.letter}
-            style={[styles.choiceButton, { backgroundColor }]}
-            onPress={() => handleSelect(choice.letter)}
-            disabled={answered || wrongChoices.includes(choice.letter)}
-          >
-            <Text style={styles.choiceText}>{choice.text}</Text>
-          </TouchableOpacity>
-        );
-      })}
-
-      {!answered && wrongChoices.length === 1 && (
-        <Text style={styles.wrong}>Incorrect, try again!</Text>
-      )}
-
-      {answered && (
-        <>
-          <Text
-            style={
-              selected === problem.correct_answer
-                ? styles.correct
-                : styles.wrong
+            if (answered) {
+              if (isCorrect) backgroundColor = '#4CAF50';
+              else if (isSelected) backgroundColor = '#F44336';
+              else backgroundColor = '#ccc';
+            } else if (wrongChoices.includes(choice.letter)) {
+              backgroundColor = '#ccc';
             }
-          >
-            {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
-          </Text>
 
-          <Text style={styles.explanation}>
-            {problem.explanation}
-          </Text>
+            return (
+              <TouchableOpacity
+                key={choice.letter}
+                style={[styles.choiceButton, { backgroundColor }]}
+                onPress={() => handleSelect(choice.letter)}
+                disabled={answered || wrongChoices.includes(choice.letter)}
+              >
+                <Text style={styles.choiceText}>{choice.text}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
 
-          <TouchableOpacity style={styles.continueButton} onPress={fetchProblem}>
-            <Text style={styles.buttonText}>Continue</Text>
-          </TouchableOpacity>
-        </>
-      )}
-    </View>
+        <View style={styles.feedbackColumn}>
+          {!answered && wrongChoices.length === 1 && (
+            <Text style={styles.wrong}>Incorrect, try again!</Text>
+          )}
+
+          {answered && (
+            <>
+              <Text
+                style={
+                  selected === problem.correct_answer
+                    ? styles.correct
+                    : styles.wrong
+                }
+              >
+                {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
+              </Text>
+
+              <Text style={styles.explanation}>{problem.explanation}</Text>
+
+              <TouchableOpacity style={styles.continueButton} onPress={fetchProblem}>
+                <Text style={styles.buttonText}>Continue</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: '#FFE787',
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: 20,
   },
-
-  question: {
-    fontSize: 20,
-    marginBottom: 15,
-    textAlign: 'center',
-    color: '#white',
-    fontWeight: '600',
-  },
-
-  choiceButton: {
-    width: '70%',
-    padding: 14,
-    borderRadius: 12,
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#A7C7E7',
-    marginVertical: 6,
-  },
-
-  choiceText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-
-  correct: {
-    color: 'green',
-    fontSize: 18,
-    marginTop: 12,
-    fontWeight: 'bold',
-  },
-
-  wrong: {
-    color: 'red',
-    fontSize: 18,
-    marginTop: 12,
-    fontWeight: 'bold',
-  },
-
-  explanation: {
-    fontSize: 14,
-    marginTop: 8,
-    textAlign: 'center',
-    color: '#white',
+    marginBottom: 20,
   },
   progress: {
-    position: 'absolute',
-    top: 65,
-    right: 20,
-    fontSize: 14,
+    fontSize: 50,
     fontWeight: 'bold',
+    color: 'white',
+  },
+  title: {
+    fontSize: 40,
+    color: 'white',
+    marginVertical: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    width: '100%',
+  },
+  question: {
+    fontSize: 80,
+    marginVertical: 15,
+    textAlign: 'center',
+  },
+  choiceButton: {
+    width: '48%',
+    minHeight: 100,
+    padding: 14,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#A7C7E7',
+    marginVertical: 10,
+  },
+  choiceText: {
+    color: 'white',
+    fontSize: 60,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    flexShrink: 1,
+  },
+  correct: {
+    color: 'green',
+    fontSize: 50,
+    marginTop: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  wrong: {
+    color: 'red',
+    fontSize: 50,
+    marginTop: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  explanation: {
+    fontSize: 60,
+    marginTop: 8,
+    textAlign: 'center',
+    color: 'white',
   },
   continueButton: {
     marginTop: 12,
     backgroundColor: '#A7C7E7',
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 6,
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: 'white',
+    fontSize: 40,
+  },
+  mainRow: {
+    flexDirection: 'column',
+    padding: 30,
+  },
+  questionColumn: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  choicesColumn: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  feedbackColumn: {
+    alignItems: 'center',
+    marginTop: 20,
   },
 });

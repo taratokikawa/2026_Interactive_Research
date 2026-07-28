@@ -37,5 +37,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginVertical: 10,
     marginHorizontal: 10,
+    color: '#4d3b2c',
   },
 });

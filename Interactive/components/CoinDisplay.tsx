@@ -28,5 +28,6 @@ const styles = StyleSheet.create({
   coins: {
     marginVertical: 10,
     marginHorizontal: 10,
+    color: '#4d3b2c',
   },
 });

@@ -10,6 +10,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import CoinDisplay from '../components/CoinDisplay';
+import React from 'react';
 
 type Problem = {
   id: string;
@@ -243,7 +244,14 @@ export default function MathScreen() {
                 {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
               </Text>
 
-              <Text style={styles.explanation}>{problem.explanation}</Text>
+              <Text style={styles.explanation}>
+                {problem.explanation.split("\n").map((line, index) => (
+                  <React.Fragment key={index}>
+                    {line}
+                    {"\n"}
+                  </React.Fragment>
+                ))}
+              </Text>
 
               <TouchableOpacity style={styles.continueButton} onPress={fetchProblem}>
                 <Text style={styles.buttonText}>Continue</Text>
@@ -285,6 +293,7 @@ const styles = StyleSheet.create({
     fontSize: 80,
     marginVertical: 15,
     textAlign: 'center',
+    color: '#4d3b2c',
   },
   choiceButton: {
     width: '48%',
@@ -321,7 +330,7 @@ const styles = StyleSheet.create({
     fontSize: 60,
     marginTop: 8,
     textAlign: 'center',
-    color: 'white',
+    color: '#4d3b2c',
   },
   continueButton: {
     marginTop: 12,

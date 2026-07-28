@@ -155,7 +155,7 @@ export default function PracticeHub() {
           <Text style={styles.title}>Profile</Text>
           <View style={styles.shopRow}>
             <CorrectCountDisplay refreshKey={avatarRefresh} />
-              <Text style={{ fontSize: 20, marginVertical: 10}}> | </Text>
+              <Text style={{ fontSize: 20, marginVertical: 10, color: '#4d3b2c' }}> | </Text>
               <CoinDisplay />
             <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/Shop')}>
               <Text style={styles.shopButtonText}>Shop</Text>
@@ -179,7 +179,7 @@ export default function PracticeHub() {
                     ) : (
                       <View style={styles.placeholderImage} />
                     )}
-                    <Text>{item.name}</Text>
+                    <Text style={styles.itemName}>{item.name}</Text>
                     <TouchableOpacity style={styles.button} onPress={() => handleEquip(item)}>
                       <Text style={styles.buttonText}>{isEquipped ? 'Unequip' : 'Equip'}</Text>
                     </TouchableOpacity>
@@ -310,7 +310,7 @@ inventoryItem: {
   padding: 8,
   alignItems: 'center',
   width: 250,
-  height: 225,
+  height: 250,
 },
 itemImage: {
   width: 160,
@@ -325,5 +325,10 @@ placeholderImage: {
 },
 avatar:{
   marginTop: -100,
-}
+},
+itemName: {
+  fontSize: 20,
+  marginVertical: 10,
+  color: '#4d3b2c',
+},
 });

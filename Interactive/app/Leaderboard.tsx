@@ -171,24 +171,29 @@ const styles = StyleSheet.create({
   rank: {
     fontWeight: 'bold',
     fontSize: 16,
+    color: '#4d3b2c',
   },
   username: {
     flex: 1,
     marginLeft: 8,
     fontSize: 25,
+    color: '#4d3b2c',
   },
   bigUsername: {
     flex: 1,
     marginLeft: 8,
     fontSize: 50,
+    color: '#4d3b2c',
   },
   stat: {
     fontSize: 14,
     marginLeft: 8,
+    color: '#4d3b2c',
   },
   bigStat: {
     fontSize: 30,
     marginLeft: 8,
+    color: '#8a7f79',
   },
   skeletonRow: {
     backgroundColor: '#f0f0f0',

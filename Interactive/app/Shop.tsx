@@ -307,16 +307,17 @@ const styles = StyleSheet.create({
   },
   message: {
     marginBottom: 10,
-    color: '#333',
+    color: '#4d3b2c',
     textAlign: 'center',
   },
   itemName: {
     fontSize: 30,
     marginBottom: 4,
+    color: '#4d3b2c',
   },
   itemPrice: {
     fontSize: 20,
-    color: '#666',
+    color: '#8a7f79',
     marginBottom: 8,
   },
 });

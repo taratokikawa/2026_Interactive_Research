@@ -66,17 +66,19 @@ const styles = StyleSheet.create({
     fontSize: 50,
     marginLeft: 15,
     marginRight: 5,
+    color: '#4d3b2c',
   },
   username: {
     flex: 1,
     paddingTop: 8,
     fontSize: 40,
     marginLeft: 8,
+    color: '#4d3b2c',
   },
   subtext: {
     paddingTop: 18,
     marginRight: 15,
     fontSize: 30,
-    color: '#666',
+    color: '#8a7f79',
   },
 });

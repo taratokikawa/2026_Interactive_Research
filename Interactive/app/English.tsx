@@ -152,6 +152,15 @@ export default function EnglishScreen() {
     const newWrongChoices = [...wrongChoices, letter];
     setWrongChoices(newWrongChoices);
 
+    const { data: userData } = await supabase.auth.getUser();
+    if (userData.user && problem) {
+      await supabase.from('incorrect_attempts').insert({
+        user_id: userData.user.id,
+        subject: 'english',
+        question_id: problem.id,
+      });
+    }
+
     if (newWrongChoices.length >= 2) {
       setSelected(letter);
       setWasCorrect(false);

@@ -30,7 +30,18 @@ export default function Login() {
     return;
   }
 
-  router.replace('/PracticeHub');
+  const { data: userData } = await supabase.auth.getUser();
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', userData.user?.id)
+    .single();
+
+  if (profile?.role === 'teacher') {
+    router.replace('/TeacherHub');
+  } else {
+    router.replace('/PracticeHub');
+  }
 };
 
   return (

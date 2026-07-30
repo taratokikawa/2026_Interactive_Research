@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { supabase } from '../lib/supabase';
+import { useRouter } from 'expo-router';
 
 type UserStat = {
   username: string;
@@ -25,6 +26,7 @@ export default function TeacherHub() {
   const [topCorrectEnglish, setTopCorrectEnglish] = useState<TopQuestion[]>([]);
   const [topIncorrectEnglish, setTopIncorrectEnglish] = useState<TopQuestion[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     fetchData();
@@ -131,12 +133,16 @@ export default function TeacherHub() {
               <View key={colIndex} style={styles.statColumn}>
                 {columnUsers.map((u, index) =>
                   u ? (
-                    <View key={index} style={styles.card}>
+                    <TouchableOpacity
+                      key={index}
+                      style={styles.card}
+                      onPress={() => router.push(`/StudentDetail?username=${u.username}`)}
+                    >
                       <Text style={styles.cardText}>{u.username}</Text>
                       <Text style={styles.cardSubText}>
                         Correct: {u.correct_count} | Incorrect: {u.incorrect_count} | Coins: {u.coins}
                       </Text>
-                    </View>
+                    </TouchableOpacity>
                   ) : (
                     <View key={index} style={[styles.card, styles.skeletonCard]}>
                       <View style={styles.skeletonLine} />
@@ -256,10 +262,11 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 14,
     fontWeight: 'bold',
+    color: '#4d3b2c',
   },
   cardSubText: {
     fontSize: 13,
-    color: '#555',
+    color: '#8a7f79',
     marginTop: 4,
   },
   skeletonCard: {

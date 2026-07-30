@@ -152,6 +152,15 @@ export default function EnglishScreen() {
     const newWrongChoices = [...wrongChoices, letter];
     setWrongChoices(newWrongChoices);
 
+    const { data: userData } = await supabase.auth.getUser();
+    if (userData.user && problem) {
+      await supabase.from('incorrect_attempts').insert({
+        user_id: userData.user.id,
+        subject: 'english',
+        question_id: problem.id,
+      });
+    }
+
     if (newWrongChoices.length >= 2) {
       setSelected(letter);
       setWasCorrect(false);
@@ -290,7 +299,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   question: {
-    fontSize: 80,
+    fontSize: 50,
     marginVertical: 15,
     textAlign: 'center',
     color: '#4d3b2c',
@@ -307,7 +316,7 @@ const styles = StyleSheet.create({
   },
   choiceText: {
     color: 'white',
-    fontSize: 60,
+    fontSize: 40,
     fontWeight: 'bold',
     textAlign: 'center',
     flexShrink: 1,

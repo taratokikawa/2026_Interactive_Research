@@ -11,6 +11,7 @@ import CorrectCountDisplay from '../components/CorrectCountDisplay';
 export default function PracticeHub() {
   const router = useRouter();
   const [avatarRefresh, setAvatarRefresh] = useState(0);
+  const [coinRefresh, setCoinRefresh] = useState(0);
 
   const PREVIEW_IMAGES: Record<string, any> = {
     red_shirt: require('../assets/items/preview/red_shirt.png'),
@@ -154,11 +155,14 @@ export default function PracticeHub() {
         <View style={styles.profileColumn}>
           <Text style={styles.title}>Profile</Text>
           <View style={styles.shopRow}>
-            <CorrectCountDisplay refreshKey={avatarRefresh} />
-              <Text style={{ fontSize: 20, marginVertical: 10, color: '#4d3b2c' }}> | </Text>
-              <CoinDisplay />
+            <CorrectCountDisplay refreshKey={avatarRefresh} fontSize={28} />
+              <Text style={{ fontSize: 28, marginVertical: 10, color: '#4d3b2c' }}> | </Text>
+              <CoinDisplay fontSize={28}/>
             <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/Shop')}>
               <Text style={styles.shopButtonText}>Shop</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.feedbackButton} onPress={() => router.push('/Feedback')}>
+              <Text style={styles.shopButtonText}>Feedback Form</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.row}>
@@ -292,13 +296,21 @@ bottomColumn: {
     backgroundColor: '#A7C7E7',
     paddingVertical: 10,
     borderRadius: 6,
-    width: 100,
+    width: 90,
+    alignItems: 'center',
+    marginLeft: 20,
+  },
+  feedbackButton: {
+    backgroundColor: '#A7C7E7',
+    paddingVertical: 10,
+    borderRadius: 6,
+    width: 220,
     alignItems: 'center',
     marginLeft: 20,
   },
   shopButtonText: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 28,
   },
 inventoryList: {
   flexDirection: 'row',

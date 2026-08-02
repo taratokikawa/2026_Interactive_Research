@@ -67,8 +67,6 @@ export default function StudentDetail() {
     .filter((q) => q.subject === 'english')
     .sort((a, b) => b.times_incorrect - a.times_incorrect);
 
-    console.log('English Correct:', englishCorrect);
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>{detail?.username ?? username}</Text>

@@ -128,13 +128,15 @@ modalBox: {
   alignItems: 'center',
 },
 modalTitle: {
-  fontWeight: 'bold',
-  fontSize: 25,
+  fontSize: 30,
   marginBottom: 15,
   textAlign: 'center',
+  color: '#4d3b2c',
 },
 modalText: {
   marginBottom: 10,
+  fontSize: 25,
   textAlign: 'center',
+  color: '#8a7f79',
 },
 });

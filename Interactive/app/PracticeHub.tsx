@@ -11,7 +11,6 @@ import CorrectCountDisplay from '../components/CorrectCountDisplay';
 export default function PracticeHub() {
   const router = useRouter();
   const [avatarRefresh, setAvatarRefresh] = useState(0);
-  const [coinRefresh, setCoinRefresh] = useState(0);
 
   const PREVIEW_IMAGES: Record<string, any> = {
     red_shirt: require('../assets/items/preview/red_shirt.png'),
@@ -100,6 +99,7 @@ export default function PracticeHub() {
               onPress={() => router.push('/Math?difficulty=easy')}
             >
               <Text style={styles.buttonText}>EASY</Text>
+              <Text style={styles.coinSubtext}>1 coin per question</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -107,6 +107,7 @@ export default function PracticeHub() {
               onPress={() => router.push('/Math?difficulty=medium')}
             >
               <Text style={styles.buttonText}>MEDIUM</Text>
+              <Text style={styles.coinSubtext}>3 coins per question</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -114,6 +115,7 @@ export default function PracticeHub() {
               onPress={() => router.push('/Math?difficulty=hard')}
             >
               <Text style={styles.buttonText}>HARD</Text>
+              <Text style={styles.coinSubtext}>5 coins per question</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -126,6 +128,7 @@ export default function PracticeHub() {
               onPress={() => router.push('/English?difficulty=easy')}
             >
               <Text style={styles.buttonText}>EASY</Text>
+              <Text style={styles.coinSubtext}>1 coin per question</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -133,6 +136,7 @@ export default function PracticeHub() {
               onPress={() => router.push('/English?difficulty=medium')}
             >
               <Text style={styles.buttonText}>MEDIUM</Text>
+              <Text style={styles.coinSubtext}>3 coins per question</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -140,6 +144,7 @@ export default function PracticeHub() {
               onPress={() => router.push('/English?difficulty=hard')}
             >
               <Text style={styles.buttonText}>HARD</Text>
+              <Text style={styles.coinSubtext}>5 coins per question</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -169,29 +174,35 @@ export default function PracticeHub() {
             <View style={styles.avatar}>
                <AvatarPreview refreshKey={avatarRefresh} size={350} />
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={true} style={styles.inventoryScroll}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.inventoryScroll}>
             <View style={styles.inventoryList}>
-              {inventoryItems.map((item) => {
-                const isEquipped =
-                  (item.type === 'shirt' && equippedShirtId === item.id) ||
-                  (item.type === 'hat' && equippedHatId === item.id);
+              {inventoryItems.length === 0 ? (
+                <Text style={styles.shopButtonText}>
+                  Spend coins in the shop to fill your inventory!
+                </Text>
+              ) : (
+                inventoryItems.map((item) => {
+                  const isEquipped =
+                    (item.type === 'shirt' && equippedShirtId === item.id) ||
+                    (item.type === 'hat' && equippedHatId === item.id);
 
-                return (
-                  <View key={item.id} style={styles.inventoryItem}>
-                    {PREVIEW_IMAGES[item.preview_image_key] ? (
-                      <Image source={PREVIEW_IMAGES[item.preview_image_key]} style={styles.itemImage} />
-                    ) : (
-                      <View style={styles.placeholderImage} />
-                    )}
-                    <Text style={styles.itemName}>{item.name}</Text>
-                    <TouchableOpacity style={styles.button} onPress={() => handleEquip(item)}>
-                      <Text style={styles.buttonText}>{isEquipped ? 'Unequip' : 'Equip'}</Text>
-                    </TouchableOpacity>
-                  </View>
-                );
-              })}
+                  return (
+                    <View key={item.id} style={styles.inventoryItem}>
+                      {PREVIEW_IMAGES[item.preview_image_key] ? (
+                        <Image source={PREVIEW_IMAGES[item.preview_image_key]} style={styles.itemImage} />
+                      ) : (
+                        <View style={styles.placeholderImage} />
+                      )}
+                      <Text>{item.name}</Text>
+                      <TouchableOpacity style={styles.button} onPress={() => handleEquip(item)}>
+                        <Text style={styles.buttonText}>{isEquipped ? 'Unequip' : 'Equip'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })
+              )}
             </View>
-            </ScrollView>
+          </ScrollView>
           </View>
         </View>
       </View>
@@ -285,6 +296,11 @@ bottomColumn: {
   buttonText: {
     color: 'white',
     fontSize: 50,
+  },
+  coinSubtext: {
+    color: 'white',
+    fontSize: 20,
+    marginTop: 4,
   },
   shopRow: {
     flexDirection: 'row',

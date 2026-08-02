@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { supabase } from '../lib/supabase';
 
-export default function CorrectCountDisplay({ refreshKey }: { refreshKey?: number }) {
+export default function CorrectCountDisplay({ refreshKey, fontSize=20 }: { refreshKey?: number, fontSize?: number }) {
   const [count, setCount] = useState<number | null>(null);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function CorrectCountDisplay({ refreshKey }: { refreshKey?: numbe
   const displayText = count === null ? '...' : String(count);
 
   return (
-    <Text style={styles.count}>
+    <Text style={[styles.count, { fontSize }]}>
       {displayText} correct
     </Text>
   );

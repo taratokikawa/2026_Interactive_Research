@@ -17,7 +17,7 @@ type TopQuestion = {
   times_incorrect?: number;
 };
 
-const MIN_ROWS = 9; // minimum skeleton rows to show per column if not enough real data
+const MIN_ROWS = 18;
 
 export default function TeacherHub() {
   const [userStats, setUserStats] = useState<UserStat[]>([]);
@@ -27,6 +27,8 @@ export default function TeacherHub() {
   const [topIncorrectEnglish, setTopIncorrectEnglish] = useState<TopQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [latestFeedback, setLatestFeedback] = useState<any | null>(null);
+  const [allFeedback, setAllFeedback] = useState<any[]>([]);
 
   useEffect(() => {
     fetchData();
@@ -34,24 +36,28 @@ export default function TeacherHub() {
 
   const fetchData = async () => {
     const [
-      { data: stats },
-      { data: correctMath },
-      { data: incorrectMath },
-      { data: correctEnglish },
-      { data: incorrectEnglish },
-    ] = await Promise.all([
-      supabase.rpc('get_teacher_user_stats'),
-      supabase.rpc('get_top_correct_math'),
-      supabase.rpc('get_top_incorrect_math'),
-      supabase.rpc('get_top_correct_english'),
-      supabase.rpc('get_top_incorrect_english'),
-    ]);
+    { data: stats },
+    { data: correctMath },
+    { data: incorrectMath },
+    { data: correctEnglish },
+    { data: incorrectEnglish },
+    { data: feedbackData },
+  ] = await Promise.all([
+    supabase.rpc('get_teacher_user_stats'),
+    supabase.rpc('get_top_correct_math'),
+    supabase.rpc('get_top_incorrect_math'),
+    supabase.rpc('get_top_correct_english'),
+    supabase.rpc('get_top_incorrect_english'),
+    supabase.rpc('get_all_feedback'),
+  ]);
 
     setUserStats(stats ?? []);
     setTopCorrectMath(correctMath ?? []);
     setTopIncorrectMath(incorrectMath ?? []);
     setTopCorrectEnglish(correctEnglish ?? []);
     setTopIncorrectEnglish(incorrectEnglish ?? []);
+    setAllFeedback(feedbackData ?? []);
+    setLatestFeedback(feedbackData?.[0] ?? null);
     setLoading(false);
   };
 
@@ -122,7 +128,7 @@ export default function TeacherHub() {
 
       <View style={styles.statsRow}>
         <View style={styles.leftColumn}>
-        <Text style={styles.sectionTitle}>Students</Text>
+        <Text style={styles.sectionTitle}>Students ({userStats.length})</Text>
         <View style={styles.statsColumns}>
           
           {[0, 1, 2].map((colIndex) => {
@@ -154,10 +160,11 @@ export default function TeacherHub() {
             );
           })}
         </View>
-        </View>
+      </View>
 
 
         <View style={styles.rightColumn}>
+        <View style={styles.averagesLeadersRow}>
           <View style={styles.averageColumn}>
             <Text style={styles.sectionTitle}>Averages</Text>
             <View style={styles.card}>
@@ -196,7 +203,31 @@ export default function TeacherHub() {
             </View>
           </View>
         </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Feedback Forms ({allFeedback.length})</Text>
+          <TouchableOpacity style={[styles.card, { height: 130 }]} onPress={() => router.push('/FeedbackDetail')}>
+            {latestFeedback ? (
+              <>
+                <Text style={styles.cardText}>{latestFeedback.username}</Text>
+                <Text style={styles.cardSubText}>
+                  Effectiveness: {latestFeedback.effectiveness_rating} | Usability: {latestFeedback.usability_rating} | Style: {latestFeedback.style_rating}
+                </Text>
+                {latestFeedback.comments ? (
+                  <Text style={styles.cardSubText} numberOfLines={4}>
+                    "{latestFeedback.comments}"
+                  </Text>
+                ) : null}
+              </>
+            ) : (
+              <Text style={styles.cardText}>No feedback submitted yet.</Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
+      </View>
+      
+      
       
       <Text style={styles.sectionTitle}>Math</Text>
       <View style={styles.pairRow}>
@@ -288,6 +319,9 @@ const styles = StyleSheet.create({
   },
   rightColumn: {
     flex: 0.3,
+    flexDirection: 'column',
+  },
+  averagesLeadersRow: {
     flexDirection: 'row',
     gap: 10,
   },
@@ -300,5 +334,9 @@ const styles = StyleSheet.create({
   leftColumn: {
     flex: 0.7,
     marginRight: 40,
+  },
+  section: {
+    width: '100%',
+    marginTop: 20,
   },
 });

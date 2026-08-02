@@ -55,11 +55,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     width: 625,
+    marginTop: 10,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 4,
+    paddingVertical: 15,
   },
   rank: {
     fontWeight: 'bold',

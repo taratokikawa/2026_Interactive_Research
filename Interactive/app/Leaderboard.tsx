@@ -58,9 +58,12 @@ export default function Leaderboard() {
       <Text style={styles.title}>Leaderboard</Text>
 
       <View style={styles.topRow}>
-        {topThreeSlots.map((entry, index) =>
-          entry ? (
-            <View key={index} style={styles.topCard}>
+        {topThreeSlots.map((entry, index) => {
+        const medalStyle =
+          index === 0 ? styles.goldBorder : index === 1 ? styles.silverBorder : styles.bronzeBorder;
+
+        return entry ? (
+          <View key={index} style={[styles.topCard, medalStyle]}>
             <Text style={styles.rank}>{index + 1}.</Text>
             <View style={styles.cardContentRow}>
               <MiniAvatar shirtKey={entry.shirt_worn_image_key} hatKey={entry.hat_worn_image_key} size={200} />
@@ -70,15 +73,15 @@ export default function Leaderboard() {
               </View>
             </View>
           </View>
-          ) : (
-            <View key={index} style={[styles.topCard, styles.skeletonCard]}>
-              <Text style={styles.rank}>{index + 1}.</Text>
-              <View style={styles.skeletonAvatar} />
-              <View style={styles.skeletonLine} />
-              <View style={styles.skeletonLineShort} />
-            </View>
-          )
-        )}
+        ) : (
+          <View key={index} style={[styles.topCard, styles.skeletonCard, medalStyle]}>
+            <Text style={styles.rank}>{index + 1}.</Text>
+            <View style={styles.skeletonAvatar} />
+            <View style={styles.skeletonLine} />
+            <View style={styles.skeletonLineShort} />
+          </View>
+        );
+      })}
       </View>
 
       <FlatList
@@ -87,13 +90,13 @@ export default function Leaderboard() {
         renderItem={({ item, index }) =>
           item ? (
             <View style={styles.row}>
-            <Text style={styles.rank}>{index + 4}.</Text>
-            <MiniAvatar shirtKey={item.shirt_worn_image_key} hatKey={item.hat_worn_image_key} size={40} />
-            <View style={styles.infoColumn}>
-              <Text style={styles.username}>{item.username}</Text>
-              <Text style={styles.stat}>{item.questions_correct} correct | Coins: {item.coins}</Text>
+              <View style={styles.leftGroup}>
+                <Text style={styles.rank}>{index + 4}.</Text>
+                <MiniAvatar shirtKey={item.shirt_worn_image_key} hatKey={item.hat_worn_image_key} size={40} />
+                <Text style={styles.username}>{item.username}</Text>
+              </View>
+              <Text style={styles.statRight}>{item.questions_correct} correct | Coins: {item.coins}</Text>
             </View>
-          </View>
           ) : (
             <View style={[styles.row, styles.skeletonRow]}>
               <Text style={styles.rank}>{index + 4}.</Text>
@@ -174,8 +177,6 @@ const styles = StyleSheet.create({
     color: '#4d3b2c',
   },
   username: {
-    flex: 1,
-    marginLeft: 8,
     fontSize: 25,
     color: '#4d3b2c',
   },
@@ -216,5 +217,27 @@ const styles = StyleSheet.create({
   infoColumn: {
     marginLeft: 8,
     justifyContent: 'center',
+  },
+  leftGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  statRight: {
+    fontSize: 14,
+    color: '#8a7f79',
+    textAlign: 'right',
+  },
+  goldBorder: {
+    borderWidth: 4,
+    borderColor: '#ecbe34',
+  },
+  silverBorder: {
+    borderWidth: 4,
+    borderColor: '#C0C0C0',
+  },
+  bronzeBorder: {
+    borderWidth: 4,
+    borderColor: '#eb9c4d',
   },
 });

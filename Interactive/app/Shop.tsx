@@ -285,6 +285,7 @@ const styles = StyleSheet.create({
   inventoryList: {
     flexDirection: 'row',
     gap: 15,
+    marginBottom: 15,
   },
   inventoryItem: {
     backgroundColor: '#fff',

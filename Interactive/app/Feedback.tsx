@@ -59,7 +59,6 @@ export default function Feedback() {
     }
 
     const { error: insertError } = await supabase.from('feedback').insert({
-      user_id: userData.user.id,
       effectiveness_rating: effectiveness,
       usability_rating: usability,
       style_rating: style,

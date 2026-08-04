@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, Modal } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 
@@ -36,12 +36,16 @@ export default function SignUp() {
       <Modal visible={showWarning} transparent animationType="fade">
       <View style={styles.modalOverlay}>
         <View style={styles.modalBox}>
-          <Text style={styles.modalTitle}>Choose your username carefully</Text>
+          <Text style={styles.modalTitle}>Voluntary Participation</Text>
+          <Text style={styles.modalText}>
+            There is NO requirement to navigate to the end of the questions – simply shut down the computer or close the tab.  If you feel anxiety, distress or any kind of emotional perturbation while testing the Educational Interactive, you are encouraged to STOP and END their participation in the study. 
+          </Text>
+          <Text style={styles.modalTitle}>Participant Confidentiality</Text>
           <Text style={styles.modalText}>
             Please do not include any identifiable information (like your real name) in your username.
           </Text>
           <TouchableOpacity style={styles.button} onPress={() => setShowWarning(false)}>
-            <Text style={styles.buttonText}>Continue</Text>
+            <Text style={styles.buttonText}>I understand</Text>
           </TouchableOpacity>
         </View>
       </View>

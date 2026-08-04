@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, Image, TouchableOpacity, ScrollView} from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal} from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import CoinDisplay from '../components/CoinDisplay';
@@ -11,6 +11,7 @@ import CorrectCountDisplay from '../components/CorrectCountDisplay';
 export default function PracticeHub() {
   const router = useRouter();
   const [avatarRefresh, setAvatarRefresh] = useState(0);
+  const [showWarning, setShowWarning] = useState(true);
 
   const PREVIEW_IMAGES: Record<string, any> = {
     red_shirt: require('../assets/items/preview/red_shirt.png'),
@@ -87,9 +88,21 @@ export default function PracticeHub() {
 
   return (
     <View style={styles.container}>
+      <Modal visible={showWarning} transparent animationType="fade">
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalBox}>
+                <Text style={styles.modalTitle}>Voluntary Participation</Text>
+                <Text style={styles.modalText}>
+                  There is NO requirement to navigate to the end of the questions – simply shut down the computer or close the tab.  If you feel anxiety, distress or any kind of emotional perturbation while testing the Educational Interactive, you are encouraged to STOP and END their participation in the study.
+                </Text>
+                <TouchableOpacity style={styles.modalButton} onPress={() => setShowWarning(false)}>
+                  <Text style={styles.modalButtonText}>I understand</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
       <Text style={styles.title}>Practice Hub</Text>
 
-      {/* Math + English side by side */}
       <View style={styles.row}>
         <View style={styles.column}>
           <Text style={styles.sectionTitle}>Math</Text>
@@ -193,7 +206,7 @@ export default function PracticeHub() {
                       ) : (
                         <View style={styles.placeholderImage} />
                       )}
-                      <Text>{item.name}</Text>
+                      <Text style={styles.itemName}>{item.name}</Text>
                       <TouchableOpacity style={styles.button} onPress={() => handleEquip(item)}>
                         <Text style={styles.buttonText}>{isEquipped ? 'Unequip' : 'Equip'}</Text>
                       </TouchableOpacity>
@@ -214,8 +227,8 @@ const styles = StyleSheet.create({
   container: {
   flex: 1,
   backgroundColor: '#FFE787',
-  alignItems: 'stretch', // changed from 'center'
-  justifyContent: 'flex-start', // changed from 'center'
+  alignItems: 'stretch',
+  justifyContent: 'flex-start',
   padding: 20,
 },
 
@@ -297,6 +310,19 @@ bottomColumn: {
     color: 'white',
     fontSize: 50,
   },
+  modalButton: {
+    backgroundColor: '#A7C7E7',
+    paddingVertical: 10,
+    borderRadius: 6,
+    marginVertical: 5,
+    width: 200,
+    alignItems: 'center',
+  },
+
+  modalButtonText: {
+    color: 'white',
+    fontSize: 30,
+  },
   coinSubtext: {
     color: 'white',
     fontSize: 20,
@@ -358,5 +384,30 @@ itemName: {
   fontSize: 20,
   marginVertical: 10,
   color: '#4d3b2c',
+},
+modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalBox: {
+  backgroundColor: '#fff',
+  padding: 40,
+  borderRadius: 8,
+  width: "40%",
+  alignItems: 'center',
+},
+modalTitle: {
+  fontSize: 30,
+  marginBottom: 15,
+  textAlign: 'center',
+  color: '#4d3b2c',
+},
+modalText: {
+  marginBottom: 10,
+  fontSize: 25,
+  textAlign: 'center',
+  color: '#8a7f79',
 },
 });

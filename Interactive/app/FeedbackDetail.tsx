@@ -10,7 +10,6 @@ type FeedbackSummary = {
 };
 
 type FeedbackEntry = {
-  username: string;
   effectiveness_rating: number;
   usability_rating: number;
   style_rating: number;
@@ -80,7 +79,6 @@ export default function FeedbackDetail() {
       ) : (
         entries.map((entry, index) => (
           <View key={index} style={styles.card}>
-            <Text style={styles.cardText}>{entry.username}</Text>
             <Text style={styles.cardSubText}>
               Effectiveness: {entry.effectiveness_rating} | Usability: {entry.usability_rating} | Style: {entry.style_rating}
             </Text>

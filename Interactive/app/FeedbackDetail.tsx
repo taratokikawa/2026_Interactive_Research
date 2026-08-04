@@ -135,21 +135,22 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#4d3b2c',
   },
   cardSubText: {
     fontSize: 14,
-    color: '#555',
+    color: '#4d3b2c',
     marginTop: 4,
   },
   comments: {
     fontSize: 14,
     fontStyle: 'italic',
     marginTop: 6,
-    color: '#333',
+    color: '#4d3b2c',
   },
   timestamp: {
     fontSize: 12,
-    color: '#999',
+    color: '#8a7f79',
     marginTop: 6,
   },
   emptyText: {

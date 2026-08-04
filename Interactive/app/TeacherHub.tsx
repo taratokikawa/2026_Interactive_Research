@@ -214,7 +214,7 @@ export default function TeacherHub() {
                   Effectiveness: {latestFeedback.effectiveness_rating} | Usability: {latestFeedback.usability_rating} | Style: {latestFeedback.style_rating}
                 </Text>
                 {latestFeedback.comments ? (
-                  <Text style={styles.cardSubText} numberOfLines={4}>
+                  <Text style={[styles.cardSubText, { fontStyle: 'italic' }]} numberOfLines={4}>
                     "{latestFeedback.comments}"
                   </Text>
                 ) : null}

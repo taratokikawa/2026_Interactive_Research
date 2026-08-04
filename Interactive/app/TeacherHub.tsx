@@ -209,7 +209,7 @@ export default function TeacherHub() {
           <TouchableOpacity style={[styles.card, { height: 130 }]} onPress={() => router.push('/FeedbackDetail')}>
             {latestFeedback ? (
               <>
-                <Text style={styles.cardText}>{latestFeedback.username}</Text>
+                <Text style={styles.cardText}>Latest Feedback</Text>
                 <Text style={styles.cardSubText}>
                   Effectiveness: {latestFeedback.effectiveness_rating} | Usability: {latestFeedback.usability_rating} | Style: {latestFeedback.style_rating}
                 </Text>

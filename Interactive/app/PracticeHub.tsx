@@ -7,11 +7,11 @@ import AvatarPreview from '../components/AvatarPreview';
 import { supabase } from '../lib/supabase';
 import CorrectCountDisplay from '../components/CorrectCountDisplay';
 
-
+let hasShownParticipationWarning = false;
 export default function PracticeHub() {
   const router = useRouter();
   const [avatarRefresh, setAvatarRefresh] = useState(0);
-  const [showWarning, setShowWarning] = useState(true);
+  const [showWarning, setShowWarning] = useState(!hasShownParticipationWarning);
 
   const PREVIEW_IMAGES: Record<string, any> = {
     red_shirt: require('../assets/items/preview/red_shirt.png'),
@@ -36,6 +36,7 @@ export default function PracticeHub() {
   const [inventoryItems, setInventoryItems] = useState<ShopItem[]>([]);
   const [equippedShirtId, setEquippedShirtId] = useState<string | null>(null);
   const [equippedHatId, setEquippedHatId] = useState<string | null>(null);
+  const [currentDiagnosis, setCurrentDiagnosis] = useState<string | null>(null);
 
   useEffect(() => {
     fetchInventory();
@@ -86,140 +87,178 @@ export default function PracticeHub() {
     setAvatarRefresh((prev) => prev + 1); 
   };
 
+  useEffect(() => {
+  fetchDiagnosis();
+}, []);
+
+const fetchDiagnosis = async () => {
+  const { data } = await supabase.rpc('get_current_diagnosis');
+  setCurrentDiagnosis(data?.[0]?.diagnosis ?? null);
+};
+
+const handleSignOut = async () => {
+  await supabase.auth.signOut();
+  router.replace('/');
+};
+
   return (
-    <View style={styles.container}>
-      <Modal visible={showWarning} transparent animationType="fade">
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalBox}>
-                <Text style={styles.modalTitle}>Voluntary Participation</Text>
-                <Text style={styles.modalText}>
-                  There is NO requirement to navigate to the end of the questions – simply shut down the computer or close the tab.  If you feel anxiety, distress or any kind of emotional perturbation while testing the Educational Interactive, you are encouraged to STOP and END their participation in the study.
-                </Text>
-                <TouchableOpacity style={styles.modalButton} onPress={() => setShowWarning(false)}>
-                  <Text style={styles.modalButtonText}>I understand</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
-      <Text style={styles.title}>Practice Hub</Text>
+    <><View style={styles.topBar}>
+      <TouchableOpacity style={styles.topBarButton} onPress={handleSignOut}>
+        <Text style={styles.topBarButtonText}>{'<'}  Sign Out</Text>
+      </TouchableOpacity>
 
-      <View style={styles.row}>
-        <View style={styles.column}>
-          <Text style={styles.sectionTitle}>Math</Text>
-          <View style={styles.difficultyRow}>
-            <TouchableOpacity
-              style={styles.fillButton}
-              onPress={() => router.push('/Math?difficulty=easy')}
-            >
-              <Text style={styles.buttonText}>EASY</Text>
-              <Text style={styles.coinSubtext}>1 coin per question</Text>
-            </TouchableOpacity>
+      <View style={styles.topBarRight}>
+        <TouchableOpacity
+        style={styles.topBarButton}
+        onPress={() => router.push(`/Diagnosis?diagnosis=${currentDiagnosis}`)}
+      >
+        <Text style={styles.topBarButtonText}>
+          {currentDiagnosis ?? '...'} Learning Prescription
+        </Text>
+      </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.fillButton}
-              onPress={() => router.push('/Math?difficulty=medium')}
-            >
-              <Text style={styles.buttonText}>MEDIUM</Text>
-              <Text style={styles.coinSubtext}>3 coins per question</Text>
-            </TouchableOpacity>
+        <TouchableOpacity style={styles.topBarButton} onPress={() => router.push('/Survey')}>
+          <Text style={styles.topBarButtonText}>Retake Diagnostic</Text>
+        </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.fillButton}
-              onPress={() => router.push('/Math?difficulty=hard')}
-            >
-              <Text style={styles.buttonText}>HARD</Text>
-              <Text style={styles.coinSubtext}>5 coins per question</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.column}>
-          <Text style={styles.sectionTitle}>English</Text>
-          <View style={styles.difficultyRow}>
-            <TouchableOpacity
-              style={styles.fillButton}
-              onPress={() => router.push('/English?difficulty=easy')}
-            >
-              <Text style={styles.buttonText}>EASY</Text>
-              <Text style={styles.coinSubtext}>1 coin per question</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.fillButton}
-              onPress={() => router.push('/English?difficulty=medium')}
-            >
-              <Text style={styles.buttonText}>MEDIUM</Text>
-              <Text style={styles.coinSubtext}>3 coins per question</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.fillButton}
-              onPress={() => router.push('/English?difficulty=hard')}
-            >
-              <Text style={styles.buttonText}>HARD</Text>
-              <Text style={styles.coinSubtext}>5 coins per question</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <TouchableOpacity style={styles.topBarButton} onPress={() => router.push('/Feedback')}>
+          <Text style={styles.topBarButtonText}>Anonymous Feedback Form</Text>
+        </TouchableOpacity>
       </View>
+    </View><View style={styles.container}>
+        <Modal visible={showWarning} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              <Text style={styles.modalTitle}>Voluntary Participation</Text>
+              <Text style={styles.modalText}>
+                There is NO requirement to navigate to the end of the questions – simply shut down the computer or close the tab.  If you feel anxiety, distress or any kind of emotional perturbation while testing the Educational Interactive, you are encouraged to STOP and END their participation in the study.
+              </Text>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  hasShownParticipationWarning = true;
+                  setShowWarning(false);
+                }}
+              >
+                <Text style={styles.modalButtonText}>I understand</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        <Text style={styles.title}>Practice Hub</Text>
 
-      {/* Leaderboard + Profile side by side */}
-      <View style={styles.bottomRow}>
-        <View style={styles.leaderboardColumn}>
-          <Text style={styles.title}>Leaderboard</Text>
-          <MiniLeaderboard />
+        <View style={styles.row}>
+          <View style={styles.column}>
+            <Text style={styles.sectionTitle}>Math</Text>
+            <View style={styles.difficultyRow}>
+              <TouchableOpacity
+                style={styles.fillButton}
+                onPress={() => router.push('/Math?difficulty=easy')}
+              >
+                <Text style={styles.buttonText}>EASY</Text>
+                <Text style={styles.coinSubtext}>1 coin per question</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.fillButton}
+                onPress={() => router.push('/Math?difficulty=medium')}
+              >
+                <Text style={styles.buttonText}>MEDIUM</Text>
+                <Text style={styles.coinSubtext}>3 coins per question</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.fillButton}
+                onPress={() => router.push('/Math?difficulty=hard')}
+              >
+                <Text style={styles.buttonText}>HARD</Text>
+                <Text style={styles.coinSubtext}>5 coins per question</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.column}>
+            <Text style={styles.sectionTitle}>English</Text>
+            <View style={styles.difficultyRow}>
+              <TouchableOpacity
+                style={styles.fillButton}
+                onPress={() => router.push('/English?difficulty=easy')}
+              >
+                <Text style={styles.buttonText}>EASY</Text>
+                <Text style={styles.coinSubtext}>1 coin per question</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.fillButton}
+                onPress={() => router.push('/English?difficulty=medium')}
+              >
+                <Text style={styles.buttonText}>MEDIUM</Text>
+                <Text style={styles.coinSubtext}>3 coins per question</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.fillButton}
+                onPress={() => router.push('/English?difficulty=hard')}
+              >
+                <Text style={styles.buttonText}>HARD</Text>
+                <Text style={styles.coinSubtext}>5 coins per question</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
 
-        <View style={styles.profileColumn}>
-          <Text style={styles.title}>Profile</Text>
-          <View style={styles.shopRow}>
-            <CorrectCountDisplay refreshKey={avatarRefresh} fontSize={28} />
+        <View style={styles.bottomRow}>
+          <View style={styles.leaderboardColumn}>
+            <Text style={styles.title}>Leaderboard</Text>
+            <MiniLeaderboard />
+          </View>
+
+          <View style={styles.profileColumn}>
+            <Text style={styles.title}>Profile</Text>
+            <View style={styles.shopRow}>
+              <CorrectCountDisplay refreshKey={avatarRefresh} fontSize={28} />
               <Text style={{ fontSize: 28, marginVertical: 10, color: '#4d3b2c' }}> | </Text>
-              <CoinDisplay fontSize={28}/>
-            <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/Shop')}>
-              <Text style={styles.shopButtonText}>Shop</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.feedbackButton} onPress={() => router.push('/Feedback')}>
-              <Text style={styles.shopButtonText}>Feedback Form</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.avatar}>
-               <AvatarPreview refreshKey={avatarRefresh} size={350} />
+              <CoinDisplay fontSize={28} />
+              <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/Shop')}>
+                <Text style={styles.shopButtonText}>Shop</Text>
+              </TouchableOpacity>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.inventoryScroll}>
-            <View style={styles.inventoryList}>
-              {inventoryItems.length === 0 ? (
-                <Text style={styles.shopButtonText}>
-                  Spend coins in the shop to fill your inventory!
-                </Text>
-              ) : (
-                inventoryItems.map((item) => {
-                  const isEquipped =
-                    (item.type === 'shirt' && equippedShirtId === item.id) ||
-                    (item.type === 'hat' && equippedHatId === item.id);
+            <View style={styles.row}>
+              <View style={styles.avatar}>
+                <AvatarPreview refreshKey={avatarRefresh} size={350} />
+              </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.inventoryScroll}>
+                <View style={styles.inventoryList}>
+                  {inventoryItems.length === 0 ? (
+                    <Text style={styles.shopButtonText}>
+                      Spend coins in the shop to fill your inventory!
+                    </Text>
+                  ) : (
+                    inventoryItems.map((item) => {
+                      const isEquipped = (item.type === 'shirt' && equippedShirtId === item.id) ||
+                        (item.type === 'hat' && equippedHatId === item.id);
 
-                  return (
-                    <View key={item.id} style={styles.inventoryItem}>
-                      {PREVIEW_IMAGES[item.preview_image_key] ? (
-                        <Image source={PREVIEW_IMAGES[item.preview_image_key]} style={styles.itemImage} />
-                      ) : (
-                        <View style={styles.placeholderImage} />
-                      )}
-                      <Text style={styles.itemName}>{item.name}</Text>
-                      <TouchableOpacity style={styles.button} onPress={() => handleEquip(item)}>
-                        <Text style={styles.buttonText}>{isEquipped ? 'Unequip' : 'Equip'}</Text>
-                      </TouchableOpacity>
-                    </View>
-                  );
-                })
-              )}
+                      return (
+                        <View key={item.id} style={styles.inventoryItem}>
+                          {PREVIEW_IMAGES[item.preview_image_key] ? (
+                            <Image source={PREVIEW_IMAGES[item.preview_image_key]} style={styles.itemImage} />
+                          ) : (
+                            <View style={styles.placeholderImage} />
+                          )}
+                          <Text style={styles.itemName}>{item.name}</Text>
+                          <TouchableOpacity style={styles.button} onPress={() => handleEquip(item)}>
+                            <Text style={styles.buttonText}>{isEquipped ? 'Unequip' : 'Equip'}</Text>
+                          </TouchableOpacity>
+                        </View>
+                      );
+                    })
+                  )}
+                </View>
+              </ScrollView>
             </View>
-          </ScrollView>
           </View>
         </View>
-      </View>
-    </View>
+      </View></>
   );
 }
 
@@ -271,7 +310,7 @@ bottomColumn: {
   title: {
   fontSize: 80,
   color: 'white',
-  marginVertical: 20,
+  marginBottom: 20,
   fontWeight: 'bold',
   textAlign: 'center',
   width: '100%',
@@ -338,7 +377,7 @@ bottomColumn: {
     backgroundColor: '#A7C7E7',
     paddingVertical: 10,
     borderRadius: 6,
-    width: 90,
+    paddingHorizontal: 20,
     alignItems: 'center',
     marginLeft: 20,
   },
@@ -352,7 +391,7 @@ bottomColumn: {
   },
   shopButtonText: {
     color: 'white',
-    fontSize: 28,
+    fontSize: 30,
   },
 inventoryList: {
   flexDirection: 'row',
@@ -409,5 +448,26 @@ modalText: {
   fontSize: 25,
   textAlign: 'center',
   color: '#8a7f79',
+},
+topBar: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  width: '100%',
+  padding: 5,
+  backgroundColor: '#fff',
+},
+topBarRight: {
+  flexDirection: 'row',
+  gap: 10,
+},
+topBarButton: {
+  paddingVertical: 12,
+  paddingHorizontal: 20,
+  borderRadius: 6,
+},
+topBarButtonText: {
+  color: '#4d3b2c',
+  fontSize: 20,
 },
 });

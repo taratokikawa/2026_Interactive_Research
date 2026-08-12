@@ -40,7 +40,17 @@ export default function Login() {
   if (profile?.role === 'teacher') {
     router.replace('/TeacherHub');
   } else {
-    router.replace('/PracticeHub');
+    const { data: surveyResults } = await supabase
+      .from('learning_survey_results')
+      .select('id')
+      .eq('user_id', userData.user?.id)
+      .limit(1);
+
+    if (!surveyResults || surveyResults.length === 0) {
+      router.replace('/Survey');
+    } else {
+      router.replace('/PracticeHub');
+    }
   }
 };
 

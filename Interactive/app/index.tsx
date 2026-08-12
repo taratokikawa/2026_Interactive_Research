@@ -8,7 +8,7 @@ export default function Home() {
     <View style={styles.container}>
       <View style={styles.row}>
         <View style={styles.column}>
-          <Text style={styles.title}>Duck Practice</Text>
+          <Text style={styles.title}>The Ducktor</Text>
 
           <TouchableOpacity
             style={styles.button}

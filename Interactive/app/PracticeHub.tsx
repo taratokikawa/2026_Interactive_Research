@@ -22,6 +22,8 @@ export default function PracticeHub() {
     bow: require('../assets/items/preview/bow.png'),
     top_hat: require('../assets/items/preview/top_hat.png'),
     crown: require('../assets/items/preview/crown.png'),
+    lab_coat: require('../assets/items/preview/lab_coat.png'),
+    head_mirror: require('../assets/items/preview/head_mirror.png'),
   };
 
   type ShopItem = {
@@ -48,8 +50,9 @@ export default function PracticeHub() {
 
     const { data: inventory } = await supabase
       .from('user_inventory')
-      .select('item_id, shop_items(*)')
-      .eq('user_id', userData.user.id);
+      .select('item_id, purchased_at, shop_items(*)')
+      .eq('user_id', userData.user.id)
+      .order('purchased_at', { ascending: false });
 
     const items = inventory?.map((i: any) => i.shop_items) ?? [];
     setInventoryItems(items);
@@ -156,7 +159,7 @@ const handleSignOut = async () => {
                 onPress={() => router.push('/Math?difficulty=easy')}
               >
                 <Text style={styles.buttonText}>EASY</Text>
-                <Text style={styles.coinSubtext}>1 coin per question</Text>
+                <Text style={styles.coinSubtext}>5 coins per question</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -164,7 +167,7 @@ const handleSignOut = async () => {
                 onPress={() => router.push('/Math?difficulty=medium')}
               >
                 <Text style={styles.buttonText}>MEDIUM</Text>
-                <Text style={styles.coinSubtext}>3 coins per question</Text>
+                <Text style={styles.coinSubtext}>10 coins per question</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -172,7 +175,7 @@ const handleSignOut = async () => {
                 onPress={() => router.push('/Math?difficulty=hard')}
               >
                 <Text style={styles.buttonText}>HARD</Text>
-                <Text style={styles.coinSubtext}>5 coins per question</Text>
+                <Text style={styles.coinSubtext}>25 coins per question</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -185,7 +188,7 @@ const handleSignOut = async () => {
                 onPress={() => router.push('/English?difficulty=easy')}
               >
                 <Text style={styles.buttonText}>EASY</Text>
-                <Text style={styles.coinSubtext}>1 coin per question</Text>
+                <Text style={styles.coinSubtext}>5 coin per question</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -193,7 +196,7 @@ const handleSignOut = async () => {
                 onPress={() => router.push('/English?difficulty=medium')}
               >
                 <Text style={styles.buttonText}>MEDIUM</Text>
-                <Text style={styles.coinSubtext}>3 coins per question</Text>
+                <Text style={styles.coinSubtext}>10 coins per question</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -201,7 +204,7 @@ const handleSignOut = async () => {
                 onPress={() => router.push('/English?difficulty=hard')}
               >
                 <Text style={styles.buttonText}>HARD</Text>
-                <Text style={styles.coinSubtext}>5 coins per question</Text>
+                <Text style={styles.coinSubtext}>25 coins per question</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -294,8 +297,8 @@ profileColumn: {
   alignItems: 'center',
 },
 inventoryScroll: {
-  maxWidth: 600,
-  marginRight: 50,
+  maxWidth: 650,
+  marginRight: 60,
 },
 bottomRow: {
   flexDirection: 'row',

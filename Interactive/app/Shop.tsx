@@ -22,6 +22,8 @@ const PREVIEW_IMAGES: Record<string, any> = {
   bow: require('../assets/items/preview/bow.png'),
   top_hat: require('../assets/items/preview/top_hat.png'),
   crown: require('../assets/items/preview/crown.png'),
+  lab_coat: require('../assets/items/preview/lab_coat.png'),
+  head_mirror: require('../assets/items/preview/head_mirror.png'),
 };
 
 export default function Shop() {
@@ -143,9 +145,6 @@ export default function Shop() {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Shop</Text>
 
-
-      {message ? <Text style={styles.message}>{message}</Text> : null}
-
       <View style={styles.shopMainRow}>
         <View style={styles.itemsColumn}>
           <Text style={styles.sectionTitle}>Shirts</Text>
@@ -163,7 +162,7 @@ export default function Shop() {
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
             <CoinDisplay refreshKey={coinRefresh} fontSize={50} />
           </View>
-          <AvatarPreview refreshKey={avatarRefresh} size={500} />
+          <AvatarPreview refreshKey={avatarRefresh} size={475} />
         </View>
       </View>
     </ScrollView>
@@ -185,11 +184,11 @@ const styles = StyleSheet.create({
   },
   itemsColumn: {
     marginLeft: 50,
-    flex: 0.7,
+    flex: 0.8,
   },
   avatarColumn: {
     marginTop: 100,
-    flex: 0.4,
+    flex: 0.3,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -254,15 +253,15 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#A7C7E7',
-    paddingVertical: 10,
+    paddingVertical: 15,
     borderRadius: 6,
     marginVertical: 5,
-    width: 200,
+    width: 170,
     alignItems: 'center',
   },
   buttonText: {
     color: 'white',
-    fontSize: 50,
+    fontSize: 40,
   },
   shopRow: {
     flexDirection: 'row',
@@ -284,7 +283,7 @@ const styles = StyleSheet.create({
   },
   inventoryList: {
     flexDirection: 'row',
-    gap: 15,
+    gap: 20,
     marginBottom: 15,
   },
   inventoryItem: {
@@ -292,7 +291,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     alignItems: 'center',
-    width: 250,
+    width: 230,
     height: 285,
   },
   itemImage: {
@@ -305,11 +304,6 @@ const styles = StyleSheet.create({
     height: 80,
     marginVertical: 8,
     backgroundColor: '#eee',
-  },
-  message: {
-    marginBottom: 10,
-    color: '#4d3b2c',
-    textAlign: 'center',
   },
   itemName: {
     fontSize: 30,

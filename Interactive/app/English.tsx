@@ -24,9 +24,9 @@ type Problem = {
 };
 
 const COIN_VALUES: Record<string, number> = {
-  easy: 1,
-  medium: 3,
-  hard: 5,
+  easy: 5,
+  medium: 10,
+  hard: 25,
 };
 
 export default function EnglishScreen() {

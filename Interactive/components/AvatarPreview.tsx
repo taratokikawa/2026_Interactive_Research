@@ -11,6 +11,8 @@ const WORN_IMAGES: Record<string, any> = {
   worn_bow: require('../assets/items/worn/worn_bow.png'),
   worn_top_hat: require('../assets/items/worn/worn_top_hat.png'),
   worn_crown: require('../assets/items/worn/worn_crown.png'),
+  worn_lab_coat: require('../assets/items/worn/worn_lab_coat.png'),
+  worn_head_mirror: require('../assets/items/worn/worn_head_mirror.png'),
 };
 
 const BASE_AVATAR = require('../assets/items/duck.png');

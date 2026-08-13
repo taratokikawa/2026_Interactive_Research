@@ -10,8 +10,17 @@ export default function SignUp() {
   const router = useRouter();
   const [showWarning, setShowWarning] = useState(true);
 
+  const SIGNUP_KEY_REQUIRED = true;
+  const SIGNUP_KEY = '2026interactiveresearch';
+  const [accessKey, setAccessKey] = useState('');
+
   const handleSignUp = async () => {
     setError('');
+
+    if (SIGNUP_KEY_REQUIRED && accessKey !== SIGNUP_KEY) {
+      setError('Invalid access key.');
+      return;
+    }
 
     const fakeEmail = `${username}@users.noreply.app`;
 
@@ -51,6 +60,16 @@ export default function SignUp() {
       </View>
     </Modal>
       <Text style={styles.title}>Sign Up</Text>
+      {SIGNUP_KEY_REQUIRED && (
+        <TextInput
+          style={styles.input}
+          placeholder="Access Key"
+          value={accessKey}
+          onChangeText={setAccessKey}
+          autoCapitalize="none"
+          placeholderTextColor="#A7C7E7"
+        />
+      )}
       <TextInput
         style={styles.input}
         placeholder="Username"

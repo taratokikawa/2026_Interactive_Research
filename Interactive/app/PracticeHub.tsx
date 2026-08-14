@@ -313,7 +313,7 @@ bottomColumn: {
   title: {
   fontSize: 80,
   color: 'white',
-  marginBottom: 20,
+  marginBottom: 10,
   fontWeight: 'bold',
   textAlign: 'center',
   width: '100%',

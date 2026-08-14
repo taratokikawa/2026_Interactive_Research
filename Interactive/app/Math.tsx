@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   progress: {
     fontSize: 50,
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   explanation: {
-    fontSize: 60,
+    fontSize: 50,
     marginTop: 8,
     textAlign: 'center',
     color: '#4d3b2c',

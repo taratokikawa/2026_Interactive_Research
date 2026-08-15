@@ -22,26 +22,10 @@ export const DIAGNOSIS_CONTENT: Record<string, DiagnosisContent> = {
     },
 
   Audio: {
-    explanation: `Audio learning is most effective for students who learn best through listening,
-    speaking, discussion, and oral repetition. Research from the University of Amsterdam found that
-    AI-assisted audio-learning tools enhance student motivation and reading engagement, leading to
-    improved academic achievement (Jafarian and Kramer). A related study on secondary education
-    students found that emotional connection to audio curricula, combined with long-term use, was
-    linked to improved academic outcomes (Stoica et al.), suggesting these benefits extend well to a
-    high school setting. Beyond interactive AI tools, more accessible resources like audiobooks have
-    also been shown to build literacy skills, expand vocabulary, and improve reading comprehension
-    for auditory learners (Wolfson). Together, these findings suggest that both AI-driven audio tools
-    and traditional audiobooks offer meaningful academic and engagement benefits for students who
-    learn best by listening.`,
-    sources: `Jafarian, Nanda R., and Anne-Wil Kramer. "AI-assisted audio-learning improves academic
-    achievement through motivation and reading engagement." Computers and Education: Artificial
-    Intelligence 8 (2025): 100357.
+    explanation: `Audio learners are students who learn best through active listening. According to Western Governors University, key characteristics of these types of learners are those who “prefer listening to a lecture over reading a book, or hearing instructions for a project instead of figuring it out hands-on” (Western Governors University). Western Governors recommends students utilize podcasts, record lectures, being active in class discussions, and reading allowed (Western Governors University). Bay Atlantic University also identifies other additional strategies for auditory learners such as verbally repeating information, playing background music to help get rid of distracting noises or silence, and through collaborative work with classmates. Overall students with this learning type should consider being active in class settings as well as strategies to maximize listening technologies.`,
+    sources: `“Auditory Learning Style Explained.” Western Governors University, 10 Aug. 2020, https://www.wgu.edu/blog/2020/08/auditory-learning-style.html. Accessed 15 Aug. 2026.
 
-    Stoica, Dimitrie, et al. "Audio-based learning in secondary education: the impact of motivational
-    and adaptive predictors on academic benefits." Interactive Learning Environments (2026): 1-19.
-
-    Wolfson, Gene. "Using Audiobooks to Meet the Needs of Adolescent Readers." American
-    Secondary Education, vol. 36, no. 2, 2008, pp. 105–14. JSTOR, http://www.jstor.org/stable/41406113.`,
+Bay Atlantic University. “Auditory Learner: Characteristics & Benefits.” Bay Atlantic University, 24 Jan. 2022, https://bau.edu/blog/auditory-learner/. Accessed 15 Aug. 2026.`,
     },
 
   Visual: {
@@ -56,13 +40,13 @@ export const DIAGNOSIS_CONTENT: Record<string, DiagnosisContent> = {
     opportunities for engaging, accessible, and effective visual learning environments. Despite
     researchers' observations that visual instruction should be carefully planned and balanced with
     other teaching methods, these advancements persist.`,
-    sources: `1. Visual Learning: The Power of Visual Aids and Multimedia
+    sources: `Visual Learning: The Power of Visual Aids and Multimedia 
     https://www.researchgate.net/profile/Moses-Alabi/publication/385662029_Visual_Learning_The_Power_of_Visual_Aids_and_Multimedia/links/672ec79a5852dd723cb18366/Visual-Learning-The-Power-of-Visual-Aids-and-Multimedia.pdf
 
-    2. Visual Literacy in Teaching and Learning: A Literature Perspective
+    Visual Literacy in Teaching and Learning: A Literature Perspective
     https://xhspz.wordpress.com/2008/07/25/visual-literacy-in-teaching-and-learning/
 
-    3. The Role of Visual Learning in Improving Students' High-Order Thinking Skills
+    The Role of Visual Learning in Improving Students' High-Order Thinking Skills
     https://eric.ed.gov/?id=EJ1112894`,
     },
 };

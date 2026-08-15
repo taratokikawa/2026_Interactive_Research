@@ -13,7 +13,7 @@ export default function Home() {
         <View style={styles.modalBox}>
         <Text style={styles.modalTitle}>Tutorial</Text>
         <Text style={styles.modalText}>1. Press the "Sign Up" button to create an account</Text>
-        <Text style={styles.modalText}>2. Log in and complete the learning type survey</Text>
+        <Text style={styles.modalText}>2. Complete the learning type survey</Text>
         <Text style={styles.modalText}>3. Use the recommended resources to enhance your learning</Text>
         <Text style={styles.modalText}>4. Hone skills through problems in the practice hub</Text>
         <TouchableOpacity

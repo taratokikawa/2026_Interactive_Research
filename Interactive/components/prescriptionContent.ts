@@ -14,11 +14,7 @@ export const PRESCRIPTION_CONTENT: Record<string, PrescriptionTip[]> = {
     explanation: 'Offers audiobook versions of textbooks and educational material, useful for reinforcing content through listening.',
   },
   {
-    title: 'Khan Academy',
-    explanation: 'Provides spoken explanations and instructional videos that walk through concepts aloud.',
-  },
-  {
-    title: 'Natural Reader (Text-to-Speech)',
+    title: 'Natural Reader',
     explanation: 'Converts written notes, PDFs, and text into spoken audio, making written material more accessible through listening.',
   },
 ],
@@ -33,20 +29,12 @@ export const PRESCRIPTION_CONTENT: Record<string, PrescriptionTip[]> = {
     explanation: 'Uses interactive graphs and visual models to help students explore concepts and patterns.',
   },
   {
-    title: 'Khan Academy',
-    explanation: 'Provides instructional videos, diagrams, and animations for math and English.',
-  },
-  {
     title: 'Canva',
     explanation: 'Allows students to create mind maps, infographics, graphic organizers, etc, helping them organize and visualize information.',
   },
 ],
 
   'Reading/Writing': [
-  {
-    title: 'Khan Academy',
-    explanation: 'Provides lessons and instructional videos across subjects, useful for reinforcing concepts through written explanations alongside video.',
-  },
   {
     title: 'Delta Math',
     explanation: 'Offers structured practice problems with written feedback, helping reinforce concepts through repetition and review.',

@@ -2,12 +2,15 @@ import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-nati
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { DIAGNOSIS_CONTENT } from '../components/diagnosisContent';
 import { PRESCRIPTION_CONTENT } from '../components/prescriptionContent';
+import { Linking } from 'react-native';
+import { LINKS_CONTENT } from '../components/linksContent';
 
 export default function Diagnosis() {
   const { diagnosis } = useLocalSearchParams<{ diagnosis: string }>();
   const router = useRouter();
 
   const tips = PRESCRIPTION_CONTENT[diagnosis ?? ''] ?? [];
+  const linkSections = LINKS_CONTENT[diagnosis ?? ''] ?? [];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -19,10 +22,36 @@ export default function Diagnosis() {
                 <Text style={styles.description}>{DIAGNOSIS_CONTENT[diagnosis ?? '']?.explanation ?? ''}</Text>
             <Text style={styles.subtitle}>Sources</Text>
                 <Text style={styles.description}>{DIAGNOSIS_CONTENT[diagnosis ?? '']?.sources ?? ''}</Text>
+            <Text style={styles.disclaimer}>
+              <Text style={styles.disclaimerBold}>Disclaimer: </Text>
+                This assessment does not constitute medical, psychological, or professional educational advice. Results are derived from a self-reported survey and do not represent a clinical diagnosis by a licensed physician, psychologist, or educational specialist.
+              </Text>
         </View>
 
         <View style={styles.rightColumn}>
             <Text style={styles.title}>Prescription</Text>
+            <Text style={styles.subtitle}>Required Practice</Text>
+
+            {linkSections.map((section, sIndex) => (
+              <View key={sIndex} style={styles.cardOutline}>
+                <Text style={styles.cardTitleBig}>{section.heading}</Text>
+                {section.items.map((item, iIndex) => (
+                  <Text key={iIndex} style={styles.cardSubtextBig}>
+                    • {item.text}
+                    {item.linkLabel && item.linkUrl && (
+                      <Text
+                        style={styles.linkText}
+                        onPress={() => Linking.openURL(item.linkUrl!)}
+                      >
+                        {' '}{item.linkLabel}
+                      </Text>
+                    )}
+                  </Text>
+                ))}
+              </View>
+            ))}
+
+            <Text style={styles.subtitle}>Recommended Tools</Text>
 
             {tips.map((tip, index) => (
             <View key={index} style={styles.card}>
@@ -36,10 +65,6 @@ export default function Diagnosis() {
         <TouchableOpacity style={styles.button} onPress={() => router.replace('/PracticeHub')}>
         <Text style={styles.buttonText}>Continue to Practice Hub</Text>
         </TouchableOpacity>
-<Text style={styles.disclaimer}>
-  <Text style={styles.disclaimerBold}>Disclaimer: </Text>
-  This assessment does not constitute medical, psychological, or professional educational advice. Results are derived from a self-reported survey and do not represent a clinical diagnosis by a licensed physician, psychologist, or educational specialist.
-</Text>
     </ScrollView>
     );
 }
@@ -49,7 +74,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: '#FFE787',
     alignItems: 'center',
-    padding: 50,
+    paddingHorizontal: 50,
+    paddingVertical: 30,
   },
   title: {
     fontSize: 50,
@@ -85,8 +111,22 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 12,
   },
+  cardOutline: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 15,
+    width: '100%',
+    marginBottom: 12,
+    borderWidth: 5,
+    borderColor: '#A7C7E7',
+  },
   cardTitle: {
     fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4d3b2c',
+  },
+  cardTitleBig: {
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#4d3b2c',
   },
@@ -95,18 +135,23 @@ const styles = StyleSheet.create({
     color: '#8a7f79',
     marginTop: 4,
   },
+  cardSubtextBig: {
+    fontSize: 20,
+    color: '#8a7f79',
+    marginTop: 4,
+    lineHeight: 28,
+  },
   button: {
     backgroundColor: '#A7C7E7',
-    paddingVertical: 12,
+    paddingVertical: 18,
     paddingHorizontal: 30,
     borderRadius: 6,
     marginTop: 20,
-    marginBottom: 30,
+    marginBottom: 10,
   },
   buttonText: {
     color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 25,
   },
   mainRow: {
   flexDirection: 'row',
@@ -121,12 +166,17 @@ rightColumn: {
   paddingLeft: 15,
 },
 disclaimer:{
-    fontSize: 25,
+    fontSize: 20,
     color: '#fff',
     textAlign: 'left',
     marginTop: 20,
 },
 disclaimerBold:{
     fontWeight: 'bold',
+},
+linkText: {
+  color: '#A7C7E7',
+  textDecorationLine: 'underline',
+  fontWeight: 'bold',
 },
 });

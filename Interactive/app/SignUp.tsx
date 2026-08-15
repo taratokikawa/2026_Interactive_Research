@@ -37,7 +37,7 @@ export default function SignUp() {
       return;
     }
 
-    router.replace('/PracticeHub');
+    router.replace('/Survey');
   };
 
   return (

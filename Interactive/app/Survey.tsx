@@ -1,8 +1,19 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  useWindowDimensions,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
-import { SURVEY_QUESTIONS, LIKERT_OPTIONS, SurveyQuestion } from '../components/surveyQuestions';
+import {
+  SURVEY_QUESTIONS,
+  LIKERT_OPTIONS,
+  SurveyQuestion,
+} from '../components/surveyQuestions';
 
 function shuffleArray<T>(array: T[]): T[] {
   const arr = [...array];
@@ -19,6 +30,10 @@ export default function Survey() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  const { width } = useWindowDimensions();
+  const isMobile = width < 700;
+  const styles = isMobile ? mobileStyles : desktopStyles;
 
   useEffect(() => {
     setQuestions(shuffleArray(SURVEY_QUESTIONS));
@@ -44,9 +59,14 @@ export default function Survey() {
 
     SURVEY_QUESTIONS.forEach((q) => {
       const score = answers[q.id] ?? 0;
-      if (q.category === 'Audio') audioScore += score;
-      else if (q.category === 'Visual') visualScore += score;
-      else readingWritingScore += score;
+
+      if (q.category === 'Audio') {
+        audioScore += score;
+      } else if (q.category === 'Visual') {
+        visualScore += score;
+      } else {
+        readingWritingScore += score;
+      }
     });
 
     const diagnosis =
@@ -57,19 +77,22 @@ export default function Survey() {
         : 'Reading/Writing';
 
     const { data: userData } = await supabase.auth.getUser();
+
     if (!userData.user) {
       setError('You must be logged in.');
       setSubmitting(false);
       return;
     }
 
-    const { error: insertError } = await supabase.from('learning_survey_results').insert({
-      user_id: userData.user.id,
-      audio_score: audioScore,
-      visual_score: visualScore,
-      reading_writing_score: readingWritingScore,
-      diagnosis,
-    });
+    const { error: insertError } = await supabase
+      .from('learning_survey_results')
+      .insert({
+        user_id: userData.user.id,
+        audio_score: audioScore,
+        visual_score: visualScore,
+        reading_writing_score: readingWritingScore,
+        diagnosis,
+      });
 
     if (insertError) {
       setError(insertError.message);
@@ -85,6 +108,7 @@ export default function Survey() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Symptom Check</Text>
+
       <Text style={styles.subtitle}>
         Rate each statement on how much it applies to your learning experience
       </Text>
@@ -94,13 +118,18 @@ export default function Survey() {
           <Text style={styles.questionText}>
             {index + 1}. {q.text}
           </Text>
+
           <View style={styles.likertRow}>
             {LIKERT_OPTIONS.map((option) => {
               const selected = answers[q.id] === option.value;
+
               return (
                 <TouchableOpacity
                   key={option.value}
-                  style={[styles.likertButton, selected && styles.likertButtonSelected]}
+                  style={[
+                    styles.likertButton,
+                    selected && styles.likertButtonSelected,
+                  ]}
                   onPress={() => handleSelect(q.id, option.value)}
                 >
                   <Text
@@ -125,13 +154,15 @@ export default function Survey() {
         onPress={handleSubmit}
         disabled={submitting}
       >
-        <Text style={styles.buttonText}>{submitting ? 'Submitting...' : 'Submit'}</Text>
+        <Text style={styles.buttonText}>
+          {submitting ? 'Submitting...' : 'Submit'}
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+const desktopStyles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: '#FFE787',
@@ -150,9 +181,11 @@ const styles = StyleSheet.create({
     color: '#8a7f79',
     marginBottom: 20,
     textAlign: 'center',
+    maxWidth: 1000,
   },
   questionBlock: {
     width: '95%',
+    maxWidth: 1400,
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 25,
@@ -160,6 +193,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   questionText: {
+    width: '100%',
     fontSize: 35,
     color: '#4d3b2c',
     marginBottom: 20,
@@ -167,7 +201,9 @@ const styles = StyleSheet.create({
   likertRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'center',
     gap: 15,
+    width: '100%',
   },
   likertButton: {
     paddingVertical: 15,
@@ -184,6 +220,7 @@ const styles = StyleSheet.create({
     color: '#A7C7E7',
     fontSize: 25,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   likertButtonTextSelected: {
     color: 'white',
@@ -192,6 +229,8 @@ const styles = StyleSheet.create({
     color: 'red',
     fontWeight: 'bold',
     marginBottom: 10,
+    fontSize: 18,
+    textAlign: 'center',
   },
   submitButton: {
     backgroundColor: '#A7C7E7',
@@ -200,9 +239,102 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginTop: 10,
     marginBottom: 30,
+    minWidth: 250,
+    alignItems: 'center',
   },
   buttonText: {
     color: 'white',
     fontSize: 30,
+    textAlign: 'center',
+  },
+});
+
+const mobileStyles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    backgroundColor: '#FFE787',
+    paddingHorizontal: 15,
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 42,
+    color: 'white',
+    marginVertical: 4,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 17,
+    color: '#8a7f79',
+    marginBottom: 18,
+    textAlign: 'center',
+    lineHeight: 23,
+  },
+  questionBlock: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 18,
+    alignItems: 'center',
+  },
+  questionText: {
+    width: '100%',
+    fontSize: 20,
+    color: '#4d3b2c',
+    marginBottom: 10,
+    lineHeight: 27,
+  },
+  likertRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 3,
+    width: '100%',
+  },
+  likertButton: {
+    flexGrow: 1,
+    minWidth: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#A7C7E7',
+    backgroundColor: '#fff',
+  },
+  likertButtonSelected: {
+    backgroundColor: '#A7C7E7',
+  },
+  likertButtonText: {
+    color: '#A7C7E7',
+    fontSize: 7.5,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  likertButtonTextSelected: {
+    color: 'white',
+  },
+  error: {
+    color: 'red',
+    fontWeight: 'bold',
+    marginBottom: 10,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  submitButton: {
+    backgroundColor: '#A7C7E7',
+    height: 60,
+    width: '100%',
+    maxWidth: 500,
+    borderRadius: 6,
+    marginTop: 10,
+    marginBottom: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 22,
+    textAlign: 'center',
   },
 });

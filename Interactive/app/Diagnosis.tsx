@@ -50,7 +50,7 @@ export default function Diagnosis() {
 
         <View style={styles.rightColumn}>
           <Text style={styles.title}>Prescription</Text>
-          <Text style={styles.subtitle}>Required Practice</Text>
+          <Text style={styles.subtitle}>Recommended Practice</Text>
 
           {linkSections.map((section, sIndex) => (
             <View key={sIndex} style={styles.cardOutline}>
@@ -71,7 +71,7 @@ export default function Diagnosis() {
             </View>
           ))}
 
-          <Text style={styles.subtitle}>Recommended Tools</Text>
+          <Text style={styles.subtitle}>Additional Tools</Text>
 
           {tips.map((tip, index) => (
             <View key={index} style={styles.card}>

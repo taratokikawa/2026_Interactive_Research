@@ -5,7 +5,6 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Modal,
   useWindowDimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -16,9 +15,8 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
-  const [showWarning, setShowWarning] = useState(true);
 
-  const SIGNUP_KEY_REQUIRED = true;
+  const SIGNUP_KEY_REQUIRED = false;
   const SIGNUP_KEY = '2026interactiveresearch';
   const [accessKey, setAccessKey] = useState('');
 
@@ -55,47 +53,6 @@ export default function SignUp() {
 
   return (
     <View style={styles.container}>
-
-      <Modal visible={showWarning} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
-
-            <Text style={styles.modalTitle}>
-              Voluntary Participation
-            </Text>
-
-            <Text style={styles.modalText}>
-              There is NO requirement to navigate to the end of the
-              questions – simply shut down the computer or close the tab.
-              If you feel anxiety, distress or any kind of emotional
-              perturbation while testing the Educational Interactive,
-              you are encouraged to STOP and END their participation
-              in the study.
-            </Text>
-
-            <Text style={styles.modalTitle}>
-              Participant Confidentiality
-            </Text>
-
-            <Text style={styles.modalText}>
-              Please do not include any identifiable information
-              (like your real name) in your username.
-            </Text>
-
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => setShowWarning(false)}
-            >
-              <Text style={styles.buttonText}>
-                I understand
-              </Text>
-            </TouchableOpacity>
-
-          </View>
-        </View>
-      </Modal>
-
-      {/* Sign Up Form */}
       <Text style={styles.title}>
         Sign Up
       </Text>
@@ -192,32 +149,6 @@ const desktopStyles = StyleSheet.create({
     fontSize: 25,
     textAlign: 'center',
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalBox: {
-    backgroundColor: '#fff',
-    padding: 40,
-    borderRadius: 8,
-    width: '40%',
-    maxWidth: 700,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 30,
-    marginBottom: 15,
-    textAlign: 'center',
-    color: '#4d3b2c',
-  },
-  modalText: {
-    marginBottom: 10,
-    fontSize: 25,
-    textAlign: 'center',
-    color: '#8a7f79',
-  },
 });
 
 const mobileStyles = StyleSheet.create({
@@ -267,33 +198,5 @@ const mobileStyles = StyleSheet.create({
     color: 'white',
     fontSize: 22,
     textAlign: 'center',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  modalBox: {
-    backgroundColor: '#fff',
-    padding: 24,
-    borderRadius: 8,
-    width: '100%',
-    maxWidth: 500,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 24,
-    marginBottom: 12,
-    textAlign: 'center',
-    color: '#4d3b2c',
-  },
-  modalText: {
-    marginBottom: 12,
-    fontSize: 16,
-    lineHeight: 22,
-    textAlign: 'center',
-    color: '#8a7f79',
   },
 });

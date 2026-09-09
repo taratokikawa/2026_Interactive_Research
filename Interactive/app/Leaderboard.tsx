@@ -46,7 +46,6 @@ export default function Leaderboard() {
     ...Array(Math.max(0, MIN_REST_ROWS - realRest.length)).fill(null),
   ];
 
-  // Pad topThree with nulls so we always render 3 slots, using skeletons for missing users
   const topThreeSlots: (LeaderboardEntry | null)[] = [
     topThree[0] ?? null,
     topThree[1] ?? null,

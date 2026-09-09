@@ -7,11 +7,9 @@ import AvatarPreview from '../components/AvatarPreview';
 import { supabase } from '../lib/supabase';
 import CorrectCountDisplay from '../components/CorrectCountDisplay';
 
-let hasShownParticipationWarning = false;
 export default function PracticeHub() {
   const router = useRouter();
   const [avatarRefresh, setAvatarRefresh] = useState(0);
-  const [showWarning, setShowWarning] = useState(!hasShownParticipationWarning);
 
   const PREVIEW_IMAGES: Record<string, any> = {
     red_shirt: require('../assets/items/preview/red_shirt.png'),
@@ -129,25 +127,6 @@ const handleSignOut = async () => {
         </TouchableOpacity>
       </View>
     </View><View style={styles.container}>
-        <Modal visible={showWarning} transparent animationType="fade">
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalBox}>
-              <Text style={styles.modalTitle}>Voluntary Participation</Text>
-              <Text style={styles.modalText}>
-                There is NO requirement to navigate to the end of the questions – simply shut down the computer or close the tab.  If you feel anxiety, distress or any kind of emotional perturbation while testing the Educational Interactive, you are encouraged to STOP and END their participation in the study.
-              </Text>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={() => {
-                  hasShownParticipationWarning = true;
-                  setShowWarning(false);
-                }}
-              >
-                <Text style={styles.modalButtonText}>I understand</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
         <Text style={styles.title}>Practice Hub</Text>
 
         <View style={styles.row}>

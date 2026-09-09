@@ -10,6 +10,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import CoinDisplay from '../components/CoinDisplay';
+import TutorChat from '../components/TutorChat';
 import React from 'react';
 
 type Problem = {
@@ -41,6 +42,7 @@ export default function EnglishScreen() {
   const [coinRefresh, setCoinRefresh] = useState(0);
   const [completedCount, setCompletedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     fetchProblem();
@@ -52,6 +54,7 @@ export default function EnglishScreen() {
     setAnswered(false);
     setWasCorrect(false);
     setSelected(null);
+    setShowChat(false);
 
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
@@ -187,12 +190,107 @@ export default function EnglishScreen() {
     );
   }
 
-  const choices = [
+const choices = [
     { letter: 'a', text: problem.choice_a },
     { letter: 'b', text: problem.choice_b },
     { letter: 'c', text: problem.choice_c },
     { letter: 'd', text: problem.choice_d },
   ];
+
+const mainContent = (
+  <>
+    <View style={styles.questionColumn}>
+      <Text style={styles.question}>{problem.question}</Text>
+    </View>
+
+    <View style={styles.choicesColumn}>
+      {choices.map((choice) => {
+        const isCorrect = choice.letter === problem.correct_answer;
+          const isSelected = choice.letter === selected;
+
+          let backgroundColor = '#A7C7E7';
+
+          if (answered) {
+            if (isCorrect) backgroundColor = '#4CAF50';
+            else if (isSelected) backgroundColor = '#F44336';
+            else backgroundColor = '#ccc';
+          } else if (wrongChoices.includes(choice.letter)) {
+            backgroundColor = '#ccc';
+          }
+
+          return (
+            <TouchableOpacity
+              key={choice.letter}
+              style={[styles.choiceButton, { backgroundColor }]}
+              onPress={() => handleSelect(choice.letter)}
+              disabled={answered || wrongChoices.includes(choice.letter)}
+            >
+              <Text style={styles.choiceText}>{choice.text}</Text>
+            </TouchableOpacity>
+          );
+      })}
+    </View>
+
+    <View style={styles.feedbackColumn}>
+    {!answered && wrongChoices.length === 1 && (
+      <>
+        <Text style={styles.wrong}>Incorrect, try again!</Text>
+
+        {!showChat && (
+          <TouchableOpacity
+            style={styles.chatToggleButton}
+            onPress={() => setShowChat(true)}
+          >
+            <Text style={styles.buttonText}>Ask a Tutor</Text>
+          </TouchableOpacity>
+        )}
+      </>
+    )}
+
+    {answered && (
+      <>
+        <Text
+          style={
+            selected === problem.correct_answer
+              ? styles.correct
+              : styles.wrong
+          }
+        >
+          {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
+        </Text>
+
+        <Text style={styles.explanation}>
+          {problem.explanation.split("\n").map((line, index) => (
+            <React.Fragment key={index}>
+              {line}
+              {"\n"}
+            </React.Fragment>
+          ))}
+        </Text>
+
+        <View style={styles.feedbackButtonRow}>
+          {!showChat && (
+            <TouchableOpacity
+              style={styles.chatToggleButton}
+              onPress={() => setShowChat(true)}
+            >
+              <Text style={styles.buttonText}>Ask a Tutor</Text>
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity
+            style={styles.continueButton}
+            onPress={fetchProblem}
+          >
+            <Text style={styles.buttonText}>Continue</Text>
+          </TouchableOpacity>
+        </View>
+      </>
+    )}
+  </View>
+    </>
+  );
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -203,72 +301,19 @@ export default function EnglishScreen() {
         </Text>
       </View>
 
-      <View style={styles.mainRow}>
-        <View style={styles.questionColumn}>
-          <Text style={styles.question}>{problem.question}</Text>
+    {showChat ? (
+    <View style={styles.outerRow}>
+        <View style={[styles.mainRow, styles.mainRowShrunk]}>{mainContent}</View>
+
+        <TutorChat
+          problem={problem}
+          subject="English"
+          onClose={() => setShowChat(false)}
+        />
         </View>
-
-        <View style={styles.choicesColumn}>
-          {choices.map((choice) => {
-            const isCorrect = choice.letter === problem.correct_answer;
-            const isSelected = choice.letter === selected;
-
-            let backgroundColor = '#A7C7E7';
-
-            if (answered) {
-              if (isCorrect) backgroundColor = '#4CAF50';
-              else if (isSelected) backgroundColor = '#F44336';
-              else backgroundColor = '#ccc';
-            } else if (wrongChoices.includes(choice.letter)) {
-              backgroundColor = '#ccc';
-            }
-
-            return (
-              <TouchableOpacity
-                key={choice.letter}
-                style={[styles.choiceButton, { backgroundColor }]}
-                onPress={() => handleSelect(choice.letter)}
-                disabled={answered || wrongChoices.includes(choice.letter)}
-              >
-                <Text style={styles.choiceText}>{choice.text}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        <View style={styles.feedbackColumn}>
-          {!answered && wrongChoices.length === 1 && (
-            <Text style={styles.wrong}>Incorrect, try again!</Text>
-          )}
-
-          {answered && (
-            <>
-              <Text
-                style={
-                  selected === problem.correct_answer
-                    ? styles.correct
-                    : styles.wrong
-                }
-              >
-                {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
-              </Text>
-
-              <Text style={styles.explanation}>
-                {problem.explanation.split("\n").map((line, index) => (
-                  <React.Fragment key={index}>
-                    {line}
-                    {"\n"}
-                  </React.Fragment>
-                ))}
-              </Text>
-
-              <TouchableOpacity style={styles.continueButton} onPress={fetchProblem}>
-                <Text style={styles.buttonText}>Continue</Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
-      </View>
+      ) : (
+          <View style={styles.mainRow}>{mainContent}</View>
+      )}
     </ScrollView>
   );
 }
@@ -331,22 +376,15 @@ const styles = StyleSheet.create({
   wrong: {
     color: 'red',
     fontSize: 50,
-    marginTop: 12,
+    marginVertical: 12,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   explanation: {
     fontSize: 40,
-    marginTop: 8,
+    marginVertical: 8,
     textAlign: 'center',
     color: '#4d3b2c',
-  },
-  continueButton: {
-    marginTop: 12,
-    backgroundColor: '#A7C7E7',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 6,
   },
   buttonText: {
     color: 'white',
@@ -368,5 +406,31 @@ const styles = StyleSheet.create({
   feedbackColumn: {
     alignItems: 'center',
     marginTop: 20,
+  },
+  outerRow: {
+    flexDirection: 'row',
+    width: '100%',
+    alignItems: 'stretch',
+    height: 800,
+  },
+  mainRowShrunk: {
+    flex: 0.66,
+  },
+  feedbackButtonRow: {
+    flexDirection: 'row',
+    gap: 20,
+    marginTop: 12,
+  },
+  chatToggleButton: {
+    backgroundColor: '#A7C7E7',
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    borderRadius: 6,
+  },
+  continueButton: {
+    backgroundColor: '#A7C7E7',
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    borderRadius: 6,
   },
 });

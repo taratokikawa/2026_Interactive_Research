@@ -13,6 +13,8 @@ import { supabase } from '../lib/supabase';
 import CoinDisplay from '../components/CoinDisplay';
 import React from 'react';
 import TutorChat from '../components/TutorChat';
+import { useHighlights, HighlightedText, AnnotateControls } from '../components/Highlight';
+
 
 type Problem = {
   id: string;
@@ -44,6 +46,8 @@ export default function MathScreen() {
   const [completedCount, setCompletedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [showChat, setShowChat] = useState(false);
+
+  const highlight = useHighlights(problem?.id ?? '');
 
   useEffect(() => {
     fetchProblem();
@@ -201,87 +205,83 @@ export default function MathScreen() {
   const mainContent = (
     <>
       <View style={styles.questionColumn}>
-        <Text style={styles.question}>{problem.question}</Text>
+        <HighlightedText
+          text={problem.question}
+          highlights={highlight.highlights}
+          onWordPress={highlight.handleWordPress}
+          style={styles.question}
+        />
+      </View>
+  
+      <View style={styles.feedbackButtonRow}>
+        {!showChat && (
+          <TouchableOpacity style={styles.chatToggleButton} onPress={() => setShowChat(true)}>
+            <Text style={styles.buttonText}>Ask a Tutor</Text>
+          </TouchableOpacity>
+        )}
+        <AnnotateControls
+          showTools={highlight.showTools}
+          toggleShowTools={highlight.toggleShowTools}
+          activeColor={highlight.activeColor}
+          setActiveColor={highlight.setActiveColor}
+          onUndo={highlight.handleUndo}
+          canUndo={highlight.canUndo}
+        />
       </View>
   
       <View style={styles.choicesColumn}>
         {choices.map((choice) => {
           const isCorrect = choice.letter === problem.correct_answer;
-            const isSelected = choice.letter === selected;
+          const isSelected = choice.letter === selected;
   
-            let backgroundColor = '#A7C7E7';
+          let backgroundColor = '#A7C7E7';
   
-            if (answered) {
-              if (isCorrect) backgroundColor = '#4CAF50';
-              else if (isSelected) backgroundColor = '#F44336';
-              else backgroundColor = '#ccc';
-            } else if (wrongChoices.includes(choice.letter)) {
-              backgroundColor = '#ccc';
-            }
+          if (answered) {
+            if (isCorrect) backgroundColor = '#4CAF50';
+            else if (isSelected) backgroundColor = '#F44336';
+            else backgroundColor = '#ccc';
+          } else if (wrongChoices.includes(choice.letter)) {
+            backgroundColor = '#ccc';
+          }
   
-            return (
-              <TouchableOpacity
-                key={choice.letter}
-                style={[styles.choiceButton, { backgroundColor }]}
-                onPress={() => handleSelect(choice.letter)}
-                disabled={answered || wrongChoices.includes(choice.letter)}
-              >
-                <Text style={styles.choiceText}>{choice.text}</Text>
-              </TouchableOpacity>
-            );
+          return (
+            <TouchableOpacity
+              key={choice.letter}
+              style={[styles.choiceButton, { backgroundColor }]}
+              onPress={() => handleSelect(choice.letter)}
+              disabled={answered || wrongChoices.includes(choice.letter)}
+            >
+              <Text style={styles.choiceText}>{choice.text}</Text>
+            </TouchableOpacity>
+          );
         })}
       </View>
   
       <View style={styles.feedbackColumn}>
         {!answered && wrongChoices.length === 1 && (
-          <>
-            <Text style={styles.wrong}>Incorrect, try again!</Text>
-    
-            {!showChat && (
-              <TouchableOpacity
-                style={styles.chatToggleButton}
-                onPress={() => setShowChat(true)}
-              >
-                <Text style={styles.buttonText}>Ask a Tutor</Text>
-              </TouchableOpacity>
-            )}
-          </>
+          <Text style={styles.wrong}>Incorrect, try again!</Text>
         )}
   
-            {answered && (
-              <>
-                <Text
-                  style={
-                    selected === problem.correct_answer
-                      ? styles.correct
-                      : styles.wrong
-                  }
-                >
-                  {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
-                </Text>
+        {answered && (
+          <>
+            <Text style={selected === problem.correct_answer ? styles.correct : styles.wrong}>
+              {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
+            </Text>
   
-                <Text style={styles.explanation}>
-                  {problem.explanation.split("\n").map((line, index) => (
-                    <React.Fragment key={index}>
-                      {line}
-                      {"\n"}
-                    </React.Fragment>
-                  ))}
-                </Text>
+            <Text style={styles.explanation}>
+              {problem.explanation.split('\n').map((line, index) => (
+                <React.Fragment key={index}>
+                  {line}
+                  {'\n'}
+                </React.Fragment>
+              ))}
+            </Text>
   
-                <View style={styles.feedbackButtonRow}>
-                  {(answered || wrongChoices.length >= 1) && !showChat && (
-                    <TouchableOpacity style={styles.chatToggleButton} onPress={() => setShowChat(true)}>
-                      <Text style={styles.buttonText}>Ask a Tutor</Text>
-                    </TouchableOpacity>
-                  )}
-  
-                  <TouchableOpacity style={styles.continueButton} onPress={fetchProblem}>
-                    <Text style={styles.buttonText}>Continue</Text>
-                  </TouchableOpacity>
-                </View>
-              </>
-            )}
+            <TouchableOpacity style={styles.continueButton} onPress={fetchProblem}>
+              <Text style={styles.buttonText}>Continue</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </>
   );

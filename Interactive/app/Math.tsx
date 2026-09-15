@@ -475,10 +475,11 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   chatToggleButton: {
-    backgroundColor: '#A7C7E7',
+    backgroundColor: '#8a7f79',
     paddingVertical: 15,
-    paddingHorizontal: 25,
-    borderRadius: 6,
+    paddingHorizontal: 15,
+    borderRadius: 50,
+    justifyContent: 'center',
   },
   continueButton: {
     backgroundColor: '#A7C7E7',

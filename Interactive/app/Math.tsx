@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   ScrollView,
-  TextInput,
+  Image,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
@@ -14,7 +14,7 @@ import CoinDisplay from '../components/CoinDisplay';
 import React from 'react';
 import TutorChat from '../components/TutorChat';
 import { useHighlights, HighlightedText, AnnotateControls } from '../components/Highlight';
-
+import * as Speech from 'expo-speech';
 
 type Problem = {
   id: string;
@@ -48,6 +48,9 @@ export default function MathScreen() {
   const [showChat, setShowChat] = useState(false);
 
   const highlight = useHighlights(problem?.id ?? '');
+
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [rate, setRate] = useState(1.0);
 
   useEffect(() => {
     fetchProblem();
@@ -176,6 +179,38 @@ export default function MathScreen() {
     }
   };
 
+  useEffect(() => {
+      Speech.stop();
+      setIsSpeaking(false);
+    }, [problem?.id]);
+  
+    useEffect(() => {
+      return () => {
+        Speech.stop();
+      };
+    }, []);
+  
+    const handleSpeak = () => {
+      if (!problem) return;
+  
+      if (isSpeaking) {
+        Speech.stop();
+        setIsSpeaking(false);
+        return;
+      }
+  
+      setIsSpeaking(true);
+      Speech.speak(problem.question, {
+        language: 'en-US',
+        pitch: 1.0,
+        rate,
+        voice: "urn:moz-tts:osx:com.apple.voice.compact.en-US.Samantha",
+        onStopped: () => setIsSpeaking(false),
+        onError: () => setIsSpeaking(false),
+      });
+    };
+  
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -214,9 +249,33 @@ export default function MathScreen() {
       </View>
   
       <View style={styles.feedbackButtonRow}>
+        <View style={styles.speakRow}>
+        <TouchableOpacity style={styles.chatToggleButton} onPress={handleSpeak}>
+          <Image
+            source={require('../assets/speech.png')}
+            style={styles.icon}
+          />
+        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.rateButton}
+            onPress={() => setRate((r) => Math.max(0.5, r - 0.25))}
+          >
+            <Text style={styles.rateButtonText}>Slower</Text>
+          </TouchableOpacity>
+          <Text style={styles.rateButtonText}>{rate.toFixed(2)}x</Text>
+          <TouchableOpacity
+            style={styles.rateButton}
+            onPress={() => setRate((r) => Math.min(1.5, r + 0.25))}
+          >
+            <Text style={styles.rateButtonText}>Faster</Text>
+          </TouchableOpacity>
+        </View>
         {!showChat && (
           <TouchableOpacity style={styles.chatToggleButton} onPress={() => setShowChat(true)}>
-            <Text style={styles.buttonText}>Ask a Tutor</Text>
+            <Image
+              source={require('../assets/typing.png')}
+              style={styles.icon}
+            />
           </TouchableOpacity>
         )}
         <AnnotateControls
@@ -426,5 +485,25 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 25,
     borderRadius: 6,
+  },
+  speakRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  rateButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+  },
+  rateButtonText: {
+    color: '#4d3b2c',
+    fontSize: 15,
+  },
+  icon: {
+    width: 50,
+    height: 50,
+    resizeMode: 'contain',
   },
 });

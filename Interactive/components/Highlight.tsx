@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextStyle, StyleProp } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextStyle, StyleProp, Image } from 'react-native';
+
 
 export type HighlightColor = 'yellow' | 'blue' | 'pink';
 
@@ -115,7 +116,10 @@ export function AnnotateControls({
   return (
     <View style={styles.row}>
       <TouchableOpacity style={styles.annotateButton} onPress={toggleShowTools}>
-        <Text style={styles.buttonText}>Highlight</Text>
+        <Image
+          source={require('../assets/marker.png')}
+          style={styles.icon}
+        />
       </TouchableOpacity>
 
       {showTools && (
@@ -152,10 +156,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   annotateButton: {
-    backgroundColor: '#A7C7E7',
+    backgroundColor: '#8a7f79',
     paddingVertical: 15,
-    paddingHorizontal: 25,
-    borderRadius: 6,
+    paddingHorizontal: 15,
+    borderRadius: 50,
+    justifyContent: 'center',
   },
   buttonText: {
     color: 'white',
@@ -163,7 +168,7 @@ const styles = StyleSheet.create({
   },
   undoButtonText: {
     color: '#4d3b2c',
-    fontSize: 40,
+    fontSize: 30,
   },
   colorSwatch: {
     width: 28,
@@ -183,5 +188,10 @@ const styles = StyleSheet.create({
   },
   undoButtonDisabled: {
     opacity: 0.5,
+  },
+  icon: {
+    width: 50,
+    height: 50,
+    resizeMode: 'contain',
   },
 });

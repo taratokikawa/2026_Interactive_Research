@@ -6,11 +6,11 @@ import { supabase } from '../lib/supabase';
 export default function SignUp() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
-  const [showWarning, setShowWarning] = useState(true);
 
-  const SIGNUP_KEY_REQUIRED = true;
+  const SIGNUP_KEY_REQUIRED = false;
   const SIGNUP_KEY = '2026interactiveresearch';
   const [accessKey, setAccessKey] = useState('');
 
@@ -22,10 +22,8 @@ export default function SignUp() {
       return;
     }
 
-    const fakeEmail = `${username}@users.noreply.app`;
-
     const { error: signUpError } = await supabase.auth.signUp({
-      email: fakeEmail,
+      email,
       password,
       options: {
         data: { username },
@@ -42,23 +40,6 @@ export default function SignUp() {
 
   return (
     <View style={styles.container}>
-      <Modal visible={showWarning} transparent animationType="fade">
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalBox}>
-          <Text style={styles.modalTitle}>Voluntary Participation</Text>
-          <Text style={styles.modalText}>
-            There is NO requirement to navigate to the end of the questions – simply shut down the computer or close the tab.  If you feel anxiety, distress or any kind of emotional perturbation while testing the Educational Interactive, you are encouraged to STOP and END their participation in the study. 
-          </Text>
-          <Text style={styles.modalTitle}>Participant Confidentiality</Text>
-          <Text style={styles.modalText}>
-            Please do not include any identifiable information (like your real name) in your username.
-          </Text>
-          <TouchableOpacity style={styles.button} onPress={() => setShowWarning(false)}>
-            <Text style={styles.buttonText}>I understand</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
       <Text style={styles.title}>Sign Up</Text>
       {SIGNUP_KEY_REQUIRED && (
         <TextInput
@@ -70,6 +51,14 @@ export default function SignUp() {
           placeholderTextColor="#A7C7E7"
         />
       )}
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        placeholderTextColor="#A7C7E7"
+      />
       <TextInput
         style={styles.input}
         placeholder="Username"

@@ -29,6 +29,7 @@ export default function TeacherHub() {
   const router = useRouter();
   const [latestFeedback, setLatestFeedback] = useState<any | null>(null);
   const [allFeedback, setAllFeedback] = useState<any[]>([]);
+  const [studentLimit, setStudentLimit] = useState(18);
 
   useEffect(() => {
     fetchData();
@@ -128,38 +129,52 @@ export default function TeacherHub() {
 
       <View style={styles.statsRow}>
         <View style={styles.leftColumn}>
+        <View>
         <Text style={styles.sectionTitle}>Students ({userStats.length})</Text>
-        <View style={styles.statsColumns}>
-          
-          {[0, 1, 2].map((colIndex) => {
-            const perColumn = Math.ceil(paddedStats.length / 3);
-            const columnUsers = paddedStats.slice(colIndex * perColumn, (colIndex + 1) * perColumn);
 
-            return (
-              <View key={colIndex} style={styles.statColumn}>
-                {columnUsers.map((u, index) =>
-                  u ? (
+        <View style={styles.statsColumns}>
+          {(() => {
+            const visibleStats = userStats.slice(0, studentLimit);
+            const perColumn = Math.ceil(visibleStats.length / 3);
+
+            return [0, 1, 2].map((colIndex) => {
+              const columnUsers = visibleStats.slice(
+                colIndex * perColumn,
+                (colIndex + 1) * perColumn
+              );
+
+              return (
+                <View key={colIndex} style={styles.statColumn}>
+                  {columnUsers.map((u, index) => (
                     <TouchableOpacity
                       key={index}
                       style={styles.card}
-                      onPress={() => router.push(`/StudentDetail?username=${u.username}`)}
+                      onPress={() =>
+                        router.push(`/StudentDetail?username=${u.username}`)
+                      }
                     >
                       <Text style={styles.cardText}>{u.username}</Text>
+
                       <Text style={styles.cardSubText}>
                         Correct: {u.correct_count} | Incorrect: {u.incorrect_count} | Coins: {u.coins}
                       </Text>
                     </TouchableOpacity>
-                  ) : (
-                    <View key={index} style={[styles.card, styles.skeletonCard]}>
-                      <View style={styles.skeletonLine} />
-                      <View style={styles.skeletonLineShort} />
-                    </View>
-                  )
-                )}
-              </View>
-            );
-          })}
+                  ))}
+                </View>
+              );
+            });
+          })()}
         </View>
+
+        {studentLimit < userStats.length && (
+          <TouchableOpacity
+            style={styles.showMoreButton}
+            onPress={() => setStudentLimit((prev) => prev + 18)}
+          >
+            <Text style={styles.showMoreText}>Show More Students</Text>
+          </TouchableOpacity>
+        )}
+      </View>
       </View>
 
 
@@ -267,14 +282,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 30,
   },
-  statsColumns: {
-    flex: 0.7,
-    flexDirection: 'row',
-    gap: 10,
-  },
-  statColumn: {
-    flex: 1,
-  },
   pairRow: {
     flexDirection: 'row',
     gap: 15,
@@ -338,5 +345,26 @@ const styles = StyleSheet.create({
   section: {
     width: '100%',
     marginTop: 20,
+  },
+  statsColumns: {
+    flexDirection: 'row',
+    width: '100%',
+    gap: 10,
+  },
+  statColumn: {
+    flex: 1,
+  },
+  showMoreButton: {
+    alignSelf: 'center',
+    marginTop: 20,
+    marginBottom: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    backgroundColor: '#A7C7E7',
+  },
+  showMoreText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });

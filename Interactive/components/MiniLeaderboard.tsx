@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import MiniAvatar from './MiniAvatar';
@@ -42,7 +42,13 @@ export default function MiniLeaderboard() {
           <Text style={styles.rank}>{index + 1}.</Text>
             <MiniAvatar shirtKey={entry.shirt_worn_image_key} hatKey={entry.hat_worn_image_key} size={75} />
           <Text style={styles.username}>{entry.username}</Text>
-          <Text style={styles.subtext}>{entry.questions_correct} correct | Coins: {entry.coins}</Text>
+          <View style={styles.subtextContainer}>
+            <Text style={styles.subtext}>
+              {entry.questions_correct} correct    
+            </Text>
+            <Image source={require('../assets/duck_coin.png')} style={styles.coinImage}/>
+            <Text style={styles.subtext}>{entry.coins}</Text>
+          </View>
         </View>
       ))}
     </TouchableOpacity>
@@ -77,9 +83,17 @@ const styles = StyleSheet.create({
     color: '#4d3b2c',
   },
   subtext: {
-    paddingTop: 20,
-    marginRight: 15,
+    marginRight: 20,
     fontSize: 25,
     color: '#8a7f79',
+  },
+  subtextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  coinImage: {
+    width: 30,
+    height: 40,
+    marginRight: 4,
   },
 });

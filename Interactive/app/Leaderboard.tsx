@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, FlatList, ActivityIndicator, Image } from 'react-native';
 import { supabase } from '../lib/supabase';
 import MiniAvatar from '../components/MiniAvatar';
 
@@ -68,7 +68,11 @@ export default function Leaderboard() {
               <MiniAvatar shirtKey={entry.shirt_worn_image_key} hatKey={entry.hat_worn_image_key} size={200} />
               <View style={styles.infoColumn}>
                 <Text style={styles.bigUsername}>{entry.username}</Text>
-                <Text style={styles.bigStat}>{entry.questions_correct} correct | Coins: {entry.coins}</Text>
+                <View style={styles.bigStat}>
+                  <Text style={styles.bigStat}>{entry.questions_correct} correct  </Text>
+                  <Image source={require('../assets/duck_coin.png')} style={styles.coinImageBig} />
+                  <Text style={styles.bigStat}>{entry.coins}</Text>
+                </View>
               </View>
             </View>
           </View>
@@ -94,7 +98,11 @@ export default function Leaderboard() {
                 <MiniAvatar shirtKey={item.shirt_worn_image_key} hatKey={item.hat_worn_image_key} size={40} />
                 <Text style={styles.username}>{item.username}</Text>
               </View>
-              <Text style={styles.statRight}>{item.questions_correct} correct | Coins: {item.coins}</Text>
+              <View style={styles.statRightContainer}>
+                <Text style={styles.statRight}>{item.questions_correct} correct  </Text>
+                <Image source={require('../assets/duck_coin.png')} style={styles.coinImageSmall} />
+                <Text style={styles.statRight}>{item.coins}</Text>
+              </View>
             </View>
           ) : (
             <View style={[styles.row, styles.skeletonRow]}>
@@ -192,8 +200,10 @@ const styles = StyleSheet.create({
   },
   bigStat: {
     fontSize: 30,
-    marginLeft: 8,
+    marginLeft: 5,
     color: '#8a7f79',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   skeletonRow: {
     backgroundColor: '#f0f0f0',
@@ -238,5 +248,20 @@ const styles = StyleSheet.create({
   bronzeBorder: {
     borderWidth: 4,
     borderColor: '#eb9c4d',
+  },
+  statRightContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  coinImageSmall: {
+    width: 15,
+    height: 20,
+    marginHorizontal: 2,
+    marginLeft: 8,
+  },
+  coinImageBig: {
+    width: 30,
+    height: 40,
+    marginLeft: 12,
   },
 });

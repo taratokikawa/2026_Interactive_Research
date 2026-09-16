@@ -199,7 +199,7 @@ const handleSignOut = async () => {
             <Text style={styles.title}>Profile</Text>
             <View style={styles.shopRow}>
               <CorrectCountDisplay refreshKey={avatarRefresh} fontSize={28} />
-              <Text style={{ fontSize: 28, marginVertical: 10, color: '#4d3b2c' }}> | </Text>
+              <Text style={{ fontSize: 28, marginVertical: 10, color: '#4d3b2c' }}>  </Text>
               <CoinDisplay fontSize={28} />
               <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/Shop')}>
                 <Text style={styles.shopButtonText}>Shop</Text>
@@ -361,7 +361,7 @@ bottomColumn: {
     borderRadius: 6,
     paddingHorizontal: 20,
     alignItems: 'center',
-    marginLeft: 20,
+    marginLeft: 40,
   },
   feedbackButton: {
     backgroundColor: '#A7C7E7',

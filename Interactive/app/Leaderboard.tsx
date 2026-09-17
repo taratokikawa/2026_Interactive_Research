@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, ActivityIndicator, Image } from 'react-native';
+import { StyleSheet, Text, View, FlatList, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
 import { supabase } from '../lib/supabase';
 import MiniAvatar from '../components/MiniAvatar';
 
@@ -14,7 +14,7 @@ type LeaderboardEntry = {
 export default function Leaderboard() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const MIN_REST_ROWS = 7; 
+  const [studentLimit, setStudentLimit] = useState(7);
 
   useEffect(() => {
     fetchLeaderboard();
@@ -39,12 +39,9 @@ export default function Leaderboard() {
   }
 
   const topThree = entries.slice(0, 3);
-  const realRest = entries.slice(3);
+  const visibleRest = entries.slice(3, 3 + studentLimit);
 
-  const restSlots: (LeaderboardEntry | null)[] = [
-    ...realRest,
-    ...Array(Math.max(0, MIN_REST_ROWS - realRest.length)).fill(null),
-  ];
+  const restSlots: LeaderboardEntry[] = visibleRest;
 
   const topThreeSlots: (LeaderboardEntry | null)[] = [
     topThree[0] ?? null,
@@ -90,28 +87,39 @@ export default function Leaderboard() {
       <FlatList
         data={restSlots}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) =>
-          item ? (
-            <View style={styles.row}>
-              <View style={styles.leftGroup}>
-                <Text style={styles.rank}>{index + 4}.</Text>
-                <MiniAvatar shirtKey={item.shirt_worn_image_key} hatKey={item.hat_worn_image_key} size={40} />
-                <Text style={styles.username}>{item.username}</Text>
-              </View>
-              <View style={styles.statRightContainer}>
-                <Text style={styles.statRight}>{item.questions_correct} correct  </Text>
-                <Image source={require('../assets/duck_coin.png')} style={styles.coinImageSmall} />
-                <Text style={styles.statRight}>{item.coins}</Text>
-              </View>
-            </View>
-          ) : (
-            <View style={[styles.row, styles.skeletonRow]}>
+        renderItem={({ item, index }) => (
+          <View style={styles.row}>
+            <View style={styles.leftGroup}>
               <Text style={styles.rank}>{index + 4}.</Text>
-              <View style={styles.skeletonAvatarSmall} />
-              <View style={styles.skeletonLineFlex} />
-              <View style={styles.skeletonLineShort} />
+              <MiniAvatar
+                shirtKey={item.shirt_worn_image_key}
+                hatKey={item.hat_worn_image_key}
+                size={40}
+              />
+              <Text style={styles.username}>{item.username}</Text>
             </View>
-          )
+
+            <View style={styles.statRightContainer}>
+              <Text style={styles.statRight}>
+                {item.questions_correct} correct
+              </Text>
+              <Image
+                source={require('../assets/duck_coin.png')}
+                style={styles.coinImageSmall}
+              />
+              <Text style={styles.statRight}>{item.coins}</Text>
+            </View>
+          </View>
+        )}
+        ListFooterComponent={
+          studentLimit < entries.length - 3 ? (
+            <TouchableOpacity
+              style={styles.showMoreButton}
+              onPress={() => setStudentLimit((prev) => prev + 10)}
+            >
+              <Text style={styles.showMoreText}>Show More Students</Text>
+            </TouchableOpacity>
+          ) : null
         }
       />
     </View>
@@ -263,5 +271,19 @@ const styles = StyleSheet.create({
     width: 30,
     height: 40,
     marginLeft: 12,
+  },
+  showMoreButton: {
+    alignSelf: 'center',
+    marginTop: 15,
+    marginBottom: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    backgroundColor: '#A7C7E7',
+  },
+
+  showMoreText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });

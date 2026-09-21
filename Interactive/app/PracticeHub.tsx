@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal} from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import CoinDisplay from '../components/CoinDisplay';
@@ -9,6 +9,8 @@ import CorrectCountDisplay from '../components/CorrectCountDisplay';
 
 export default function PracticeHub() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isMobile = width < 700;
   const [avatarRefresh, setAvatarRefresh] = useState(0);
 
   const PREVIEW_IMAGES: Record<string, any> = {
@@ -42,6 +44,10 @@ export default function PracticeHub() {
     fetchInventory();
   }, []);
 
+  useEffect(() => {
+    fetchDiagnosis();
+  }, []);
+
   const fetchInventory = async () => {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
@@ -65,6 +71,11 @@ export default function PracticeHub() {
     setEquippedHatId(avatar?.equipped_hat ?? null);
   };
 
+  const fetchDiagnosis = async () => {
+    const { data } = await supabase.rpc('get_current_diagnosis');
+    setCurrentDiagnosis(data?.[0]?.diagnosis ?? null);
+  };
+
   const handleEquip = async (item: ShopItem) => {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
@@ -85,48 +96,54 @@ export default function PracticeHub() {
       setEquippedHatId(newValue);
     }
 
-    setAvatarRefresh((prev) => prev + 1); 
+    setAvatarRefresh((prev) => prev + 1);
   };
 
-  useEffect(() => {
-  fetchDiagnosis();
-}, []);
-
-const fetchDiagnosis = async () => {
-  const { data } = await supabase.rpc('get_current_diagnosis');
-  setCurrentDiagnosis(data?.[0]?.diagnosis ?? null);
-};
-
-const handleSignOut = async () => {
-  await supabase.auth.signOut();
-  router.replace('/');
-};
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.replace('/');
+  };
 
   return (
-    <><View style={styles.topBar}>
-      <TouchableOpacity style={styles.topBarButton} onPress={handleSignOut}>
-        <Text style={styles.topBarButtonText}>{'<'}  Sign Out</Text>
-      </TouchableOpacity>
+    <>
+    {isMobile && (
+          <View style={styles.mobileOverlay}>
+            <View style={styles.modalBoxMobile}>
+              <Text style={styles.modalTitle}>End of mobile demo</Text>
+              <Text style={styles.modalText}>
+                Continue on a laptop or ipad for full access to The Ducktor!
+              </Text>
+            </View>
+          </View>
+        )}
 
-      <View style={styles.topBarRight}>
-        <TouchableOpacity
-        style={styles.topBarButton}
-        onPress={() => router.push(`/Diagnosis?diagnosis=${currentDiagnosis}`)}
-      >
-        <Text style={styles.topBarButtonText}>
-          {currentDiagnosis ?? '...'} Learning Prescription
-        </Text>
-      </TouchableOpacity>
-
-        <TouchableOpacity style={styles.topBarButton} onPress={() => router.push('/Survey')}>
-          <Text style={styles.topBarButtonText}>Retake Diagnostic</Text>
+      <View style={styles.topBar}>
+        <TouchableOpacity style={styles.topBarButton} onPress={handleSignOut}>
+          <Text style={styles.topBarButtonText}>{'<'} Sign Out</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.topBarButton} onPress={() => router.push('/Feedback')}>
-          <Text style={styles.topBarButtonText}>Anonymous Feedback Form</Text>
-        </TouchableOpacity>
+        <View style={styles.topBarRight}>
+          <TouchableOpacity
+            style={styles.topBarButton}
+            onPress={() => router.push(`/Diagnosis?diagnosis=${currentDiagnosis}`)}
+          >
+            <Text style={styles.topBarButtonText}>
+              {currentDiagnosis ?? '...'} Learning Prescription
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.topBarButton} onPress={() => router.push('/Survey')}>
+            <Text style={styles.topBarButtonText}>Retake Diagnostic</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.topBarButton} onPress={() => router.push('/Feedback')}>
+            <Text style={styles.topBarButtonText}>Anonymous Feedback Form</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View><View style={styles.container}>
+
+      <View style={styles.container}>
+
         <Text style={styles.title}>Practice Hub</Text>
 
         <View style={styles.row}>
@@ -197,22 +214,33 @@ const handleSignOut = async () => {
 
           <View style={styles.profileColumn}>
             <Text style={styles.title}>Profile</Text>
+
             <View style={styles.shopRow}>
               <CorrectCountDisplay refreshKey={avatarRefresh} fontSize={28} />
               <Text style={{ fontSize: 28, marginVertical: 10, color: '#4d3b2c' }}>  </Text>
               <CoinDisplay fontSize={28} />
-              <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/Shop')}>
+
+              <TouchableOpacity
+                style={styles.shopButton}
+                onPress={() => router.push('/Shop')}
+              >
                 <Text style={styles.shopButtonText}>Shop</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/TutorRequest')}>
                 <Text style={styles.shopButtonText}>Find a Tutor</Text>
               </TouchableOpacity>
             </View>
+
             <View style={styles.row}>
               <View style={styles.avatar}>
                 <AvatarPreview refreshKey={avatarRefresh} size={350} />
               </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.inventoryScroll}>
+
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.inventoryScroll}
+              >
                 <View style={styles.inventoryList}>
                   {inventoryItems.length === 0 ? (
                     <Text style={styles.shopButtonText}>
@@ -220,19 +248,30 @@ const handleSignOut = async () => {
                     </Text>
                   ) : (
                     inventoryItems.map((item) => {
-                      const isEquipped = (item.type === 'shirt' && equippedShirtId === item.id) ||
+                      const isEquipped =
+                        (item.type === 'shirt' && equippedShirtId === item.id) ||
                         (item.type === 'hat' && equippedHatId === item.id);
 
                       return (
                         <View key={item.id} style={styles.inventoryItem}>
                           {PREVIEW_IMAGES[item.preview_image_key] ? (
-                            <Image source={PREVIEW_IMAGES[item.preview_image_key]} style={styles.itemImage} />
+                            <Image
+                              source={PREVIEW_IMAGES[item.preview_image_key]}
+                              style={styles.itemImage}
+                            />
                           ) : (
                             <View style={styles.placeholderImage} />
                           )}
+
                           <Text style={styles.itemName}>{item.name}</Text>
-                          <TouchableOpacity style={styles.button} onPress={() => handleEquip(item)}>
-                            <Text style={styles.buttonText}>{isEquipped ? 'Unequip' : 'Equip'}</Text>
+
+                          <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => handleEquip(item)}
+                          >
+                            <Text style={styles.buttonText}>
+                              {isEquipped ? 'Unequip' : 'Equip'}
+                            </Text>
                           </TouchableOpacity>
                         </View>
                       );
@@ -243,7 +282,8 @@ const handleSignOut = async () => {
             </View>
           </View>
         </View>
-      </View></>
+      </View>
+    </>
   );
 }
 
@@ -378,81 +418,100 @@ bottomColumn: {
     color: 'white',
     fontSize: 30,
   },
-  inventoryList: {
-    flexDirection: 'row',
-    gap: 15,
-  },
-  inventoryItem: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 8,
-    alignItems: 'center',
-    width: 250,
-    height: 250,
-  },
-  itemImage: {
-    width: 160,
-    height: 80,
-    marginVertical: 8,
-  },
-  placeholderImage: {
-    width: 160,
-    height: 80,
-    marginVertical: 8,
-    backgroundColor: '#eee',
-  },
-  avatar:{
-    marginTop: -100,
-  },
-  itemName: {
-    fontSize: 20,
-    marginVertical: 10,
-    color: '#4d3b2c',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalBox: {
-    backgroundColor: '#fff',
-    padding: 40,
-    borderRadius: 8,
-    width: "40%",
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 30,
-    marginBottom: 15,
-    textAlign: 'center',
-    color: '#4d3b2c',
-  },
-  modalText: {
-    marginBottom: 10,
-    fontSize: 25,
-    textAlign: 'center',
-    color: '#8a7f79',
-  },
-  topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    padding: 5,
-    backgroundColor: '#fff',
-  },
-  topBarRight: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  topBarButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 6,
-  },
-  topBarButtonText: {
-    color: '#4d3b2c',
-    fontSize: 20,
-  },
+inventoryList: {
+  flexDirection: 'row',
+  gap: 15,
+},
+inventoryItem: {
+  backgroundColor: '#fff',
+  borderRadius: 8,
+  padding: 8,
+  alignItems: 'center',
+  width: 250,
+  height: 250,
+},
+itemImage: {
+  width: 160,
+  height: 80,
+  marginVertical: 8,
+},
+placeholderImage: {
+  width: 160,
+  height: 80,
+  marginVertical: 8,
+  backgroundColor: '#eee',
+},
+avatar:{
+  marginTop: -100,
+},
+itemName: {
+  fontSize: 20,
+  marginVertical: 10,
+  color: '#4d3b2c',
+},
+modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalBox: {
+  backgroundColor: '#fff',
+  padding: 40,
+  borderRadius: 8,
+  width: "40%",
+  alignItems: 'center',
+},
+modalBoxMobile: {
+  backgroundColor: '#fff',
+  padding: 40,
+  borderRadius: 8,
+  width: "80%",
+  alignItems: 'center',
+},
+modalTitle: {
+  fontSize: 30,
+  marginBottom: 15,
+  textAlign: 'center',
+  color: '#4d3b2c',
+},
+modalText: {
+  marginBottom: 10,
+  fontSize: 25,
+  textAlign: 'center',
+  color: '#8a7f79',
+},
+topBar: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  width: '100%',
+  padding: 5,
+  backgroundColor: '#fff',
+},
+topBarRight: {
+  flexDirection: 'row',
+  gap: 10,
+},
+topBarButton: {
+  paddingVertical: 12,
+  paddingHorizontal: 20,
+  borderRadius: 6,
+},
+topBarButtonText: {
+  color: '#4d3b2c',
+  fontSize: 20,
+},
+mobileOverlay: {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  justifyContent: 'center',
+  alignItems: 'center',
+  zIndex: 9999,
+  elevation: 9999,
+},
 });

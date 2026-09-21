@@ -86,6 +86,7 @@ export default function Leaderboard() {
 
       <FlatList
         data={restSlots}
+        showsVerticalScrollIndicator={false}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => (
           <View style={styles.row}>

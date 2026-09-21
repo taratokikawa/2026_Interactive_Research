@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
   },
   explanation: {
     fontSize: 50,
-    marginTop: 8,
+    marginVertical: 8,
     textAlign: 'center',
     color: '#4d3b2c',
   },

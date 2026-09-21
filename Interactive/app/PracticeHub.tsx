@@ -167,7 +167,7 @@ const handleSignOut = async () => {
                 onPress={() => router.push('/English?difficulty=easy')}
               >
                 <Text style={styles.buttonText}>EASY</Text>
-                <Text style={styles.coinSubtext}>5 coin per question</Text>
+                <Text style={styles.coinSubtext}>5 coins per question</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -203,6 +203,9 @@ const handleSignOut = async () => {
               <CoinDisplay fontSize={28} />
               <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/Shop')}>
                 <Text style={styles.shopButtonText}>Shop</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/TutorRequest')}>
+                <Text style={styles.shopButtonText}>Find a Tutor</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.row}>
@@ -361,7 +364,7 @@ bottomColumn: {
     borderRadius: 6,
     paddingHorizontal: 20,
     alignItems: 'center',
-    marginLeft: 40,
+    marginLeft: 30,
   },
   feedbackButton: {
     backgroundColor: '#A7C7E7',
@@ -375,81 +378,81 @@ bottomColumn: {
     color: 'white',
     fontSize: 30,
   },
-inventoryList: {
-  flexDirection: 'row',
-  gap: 15,
-},
-inventoryItem: {
-  backgroundColor: '#fff',
-  borderRadius: 8,
-  padding: 8,
-  alignItems: 'center',
-  width: 250,
-  height: 250,
-},
-itemImage: {
-  width: 160,
-  height: 80,
-  marginVertical: 8,
-},
-placeholderImage: {
-  width: 160,
-  height: 80,
-  marginVertical: 8,
-  backgroundColor: '#eee',
-},
-avatar:{
-  marginTop: -100,
-},
-itemName: {
-  fontSize: 20,
-  marginVertical: 10,
-  color: '#4d3b2c',
-},
-modalOverlay: {
-  flex: 1,
-  backgroundColor: 'rgba(0,0,0,0.5)',
-  justifyContent: 'center',
-  alignItems: 'center',
-},
-modalBox: {
-  backgroundColor: '#fff',
-  padding: 40,
-  borderRadius: 8,
-  width: "40%",
-  alignItems: 'center',
-},
-modalTitle: {
-  fontSize: 30,
-  marginBottom: 15,
-  textAlign: 'center',
-  color: '#4d3b2c',
-},
-modalText: {
-  marginBottom: 10,
-  fontSize: 25,
-  textAlign: 'center',
-  color: '#8a7f79',
-},
-topBar: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  width: '100%',
-  padding: 5,
-  backgroundColor: '#fff',
-},
-topBarRight: {
-  flexDirection: 'row',
-  gap: 10,
-},
-topBarButton: {
-  paddingVertical: 12,
-  paddingHorizontal: 20,
-  borderRadius: 6,
-},
-topBarButtonText: {
-  color: '#4d3b2c',
-  fontSize: 20,
-},
+  inventoryList: {
+    flexDirection: 'row',
+    gap: 15,
+  },
+  inventoryItem: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 8,
+    alignItems: 'center',
+    width: 250,
+    height: 250,
+  },
+  itemImage: {
+    width: 160,
+    height: 80,
+    marginVertical: 8,
+  },
+  placeholderImage: {
+    width: 160,
+    height: 80,
+    marginVertical: 8,
+    backgroundColor: '#eee',
+  },
+  avatar:{
+    marginTop: -100,
+  },
+  itemName: {
+    fontSize: 20,
+    marginVertical: 10,
+    color: '#4d3b2c',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBox: {
+    backgroundColor: '#fff',
+    padding: 40,
+    borderRadius: 8,
+    width: "40%",
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 30,
+    marginBottom: 15,
+    textAlign: 'center',
+    color: '#4d3b2c',
+  },
+  modalText: {
+    marginBottom: 10,
+    fontSize: 25,
+    textAlign: 'center',
+    color: '#8a7f79',
+  },
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    padding: 5,
+    backgroundColor: '#fff',
+  },
+  topBarRight: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  topBarButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+  },
+  topBarButtonText: {
+    color: '#4d3b2c',
+    fontSize: 20,
+  },
 });

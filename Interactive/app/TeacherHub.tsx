@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, ActivityIndicator, TouchableOpacity, Linking } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { useRouter } from 'expo-router';
 
@@ -17,7 +17,15 @@ type TopQuestion = {
   times_incorrect?: number;
 };
 
-const MIN_ROWS = 18;
+type TutorRequestRow = {
+  id: string;
+  subject: string;
+  details: string;
+  proposed_start: string;
+  proposed_end: string;
+  status: string;
+  profiles: { username: string; email: string } | null;
+};
 
 export default function TeacherHub() {
   const [userStats, setUserStats] = useState<UserStat[]>([]);
@@ -29,6 +37,64 @@ export default function TeacherHub() {
   const router = useRouter();
   const [latestFeedback, setLatestFeedback] = useState<any | null>(null);
   const [allFeedback, setAllFeedback] = useState<any[]>([]);
+  const [studentLimit, setStudentLimit] = useState(18);
+  const [tutorRequests, setTutorRequests] = useState<TutorRequestRow[]>([]);
+  const [tutorRequestLimit, setTutorRequestLimit] = useState(3);
+
+  const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+
+  const formatReadable = (isoString: string) =>
+    new Date(isoString).toLocaleString([], {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+
+  const formatGCalDate = (isoString: string) =>
+    new Date(isoString).toISOString().replace(/[-:]|\.\d{3}/g, '');
+
+  const buildGoogleCalendarUrl = (request: TutorRequestRow) => {
+    const dates = `${formatGCalDate(request.proposed_start)}/${formatGCalDate(request.proposed_end)}`;
+    const text = encodeURIComponent(`Tutoring: ${request.subject}`);
+    const details = encodeURIComponent(request.details ?? '');
+    const guest = request.profiles?.email ? `&add=${encodeURIComponent(request.profiles.email)}` : '';
+
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${dates}&details=${details}${guest}`;
+  };
+
+  useEffect(() => {
+    fetchTutorRequests();
+  }, []);
+
+  const fetchTutorRequests = async () => {
+    const { data, error } = await supabase
+      .from('tutor_requests')
+      .select('*, profiles:student_id(username, email)')
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('fetchTutorRequests error:', error.message);
+    }
+
+    setTutorRequests(data ?? []);
+  };
+
+  const handleAccept = async (request: TutorRequestRow) => {
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) return;
+
+    const { error } = await supabase
+      .from('tutor_requests')
+      .update({ status: 'accepted', teacher_id: userData.user.id })
+      .eq('id', request.id);
+
+    if (error) return;
+
+    fetchTutorRequests();
+    Linking.openURL(buildGoogleCalendarUrl(request));
+  };
 
   useEffect(() => {
     fetchData();
@@ -90,11 +156,6 @@ export default function TeacherHub() {
     ? [...userStats].sort((a, b) => b.coins - a.coins)[0]
     : null;
 
-  const paddedStats: (UserStat | null)[] = [
-    ...userStats,
-    ...Array(Math.max(0, MIN_ROWS - userStats.length)).fill(null),
-  ];
-
   const renderQuestionList = (title: string, questions: TopQuestion[], key: 'times_correct' | 'times_incorrect') => {
     const padded = [...questions, ...Array(Math.max(0, 3 - questions.length)).fill(null)];
 
@@ -128,38 +189,52 @@ export default function TeacherHub() {
 
       <View style={styles.statsRow}>
         <View style={styles.leftColumn}>
+        <View>
         <Text style={styles.sectionTitle}>Students ({userStats.length})</Text>
-        <View style={styles.statsColumns}>
-          
-          {[0, 1, 2].map((colIndex) => {
-            const perColumn = Math.ceil(paddedStats.length / 3);
-            const columnUsers = paddedStats.slice(colIndex * perColumn, (colIndex + 1) * perColumn);
 
-            return (
-              <View key={colIndex} style={styles.statColumn}>
-                {columnUsers.map((u, index) =>
-                  u ? (
+        <View style={styles.statsColumns}>
+          {(() => {
+            const visibleStats = userStats.slice(0, studentLimit);
+            const perColumn = Math.ceil(visibleStats.length / 3);
+
+            return [0, 1, 2].map((colIndex) => {
+              const columnUsers = visibleStats.slice(
+                colIndex * perColumn,
+                (colIndex + 1) * perColumn
+              );
+
+              return (
+                <View key={colIndex} style={styles.statColumn}>
+                  {columnUsers.map((u, index) => (
                     <TouchableOpacity
                       key={index}
                       style={styles.card}
-                      onPress={() => router.push(`/StudentDetail?username=${u.username}`)}
+                      onPress={() =>
+                        router.push(`/StudentDetail?username=${u.username}`)
+                      }
                     >
                       <Text style={styles.cardText}>{u.username}</Text>
+
                       <Text style={styles.cardSubText}>
                         Correct: {u.correct_count} | Incorrect: {u.incorrect_count} | Coins: {u.coins}
                       </Text>
                     </TouchableOpacity>
-                  ) : (
-                    <View key={index} style={[styles.card, styles.skeletonCard]}>
-                      <View style={styles.skeletonLine} />
-                      <View style={styles.skeletonLineShort} />
-                    </View>
-                  )
-                )}
-              </View>
-            );
-          })}
+                  ))}
+                </View>
+              );
+            });
+          })()}
         </View>
+
+        {studentLimit < userStats.length && (
+          <TouchableOpacity
+            style={styles.showMoreButton}
+            onPress={() => setStudentLimit((prev) => prev + 18)}
+          >
+            <Text style={styles.showMoreText}>Show More Students</Text>
+          </TouchableOpacity>
+        )}
+      </View>
       </View>
 
 
@@ -227,7 +302,40 @@ export default function TeacherHub() {
       </View>
       </View>
       
-      
+      <Text style={styles.sectionTitle}>Tutor Requests</Text>
+        {tutorRequests.length === 0 ? (
+          <Text style={styles.cardText}>No pending requests</Text>
+        ) : (
+          <>
+            <View style={styles.tutorRequestsGrid}>
+              {tutorRequests.slice(0, tutorRequestLimit).map((request) => (
+                <View key={request.id} style={[styles.card, styles.tutorRequestCard]}>
+                  <Text style={styles.cardText}>{request.subject}</Text>
+                  <Text style={styles.cardSubText}>{request.details}</Text>
+                  <Text style={styles.cardSubText}>Status: {capitalize(request.status)}</Text>
+                  <Text style={styles.cardSubText}>Start: {formatReadable(request.proposed_start)}</Text>
+                  <Text style={styles.cardSubText}>End: {formatReadable(request.proposed_end)}</Text>
+                  <Text style={styles.cardSubText}>From: {request.profiles?.username}</Text>
+
+                  {request.status === 'pending' && (
+                    <TouchableOpacity style={styles.showMoreButton} onPress={() => handleAccept(request)}>
+                      <Text style={styles.showMoreText}>Accept</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ))}
+            </View>
+
+            {tutorRequestLimit < tutorRequests.length && (
+              <TouchableOpacity
+                style={styles.showMoreButton}
+                onPress={() => setTutorRequestLimit((prev) => prev + 3)}
+              >
+                <Text style={styles.showMoreText}>Show More Requests</Text>
+              </TouchableOpacity>
+            )}
+          </>
+        )}
       
       <Text style={styles.sectionTitle}>Math</Text>
       <View style={styles.pairRow}>
@@ -266,14 +374,6 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     marginBottom: 30,
-  },
-  statsColumns: {
-    flex: 0.7,
-    flexDirection: 'row',
-    gap: 10,
-  },
-  statColumn: {
-    flex: 1,
   },
   pairRow: {
     flexDirection: 'row',
@@ -338,5 +438,40 @@ const styles = StyleSheet.create({
   section: {
     width: '100%',
     marginTop: 20,
+  },
+  statsColumns: {
+    flexDirection: 'row',
+    width: '100%',
+    gap: 10,
+  },
+  statColumn: {
+    flex: 1,
+  },
+  showMoreButton: {
+    alignSelf: 'center',
+    marginTop: 20,
+    marginBottom: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    backgroundColor: '#A7C7E7',
+  },
+  showMoreText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  acceptButton: {
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    backgroundColor: '#A7C7E7',
+  },
+  tutorRequestsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+  },
+  tutorRequestCard: {
+    width: '32.5%',
   },
 });

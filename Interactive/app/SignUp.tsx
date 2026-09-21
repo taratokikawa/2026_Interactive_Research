@@ -13,6 +13,7 @@ import { supabase } from '../lib/supabase';
 export default function SignUp() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
 
@@ -33,10 +34,8 @@ export default function SignUp() {
       return;
     }
 
-    const fakeEmail = `${username}@users.noreply.app`;
-
     const { error: signUpError } = await supabase.auth.signUp({
-      email: fakeEmail,
+      email,
       password,
       options: {
         data: { username },
@@ -68,6 +67,14 @@ export default function SignUp() {
         />
       )}
 
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        placeholderTextColor="#A7C7E7"
+      />
       <TextInput
         style={styles.input}
         placeholder="Username"

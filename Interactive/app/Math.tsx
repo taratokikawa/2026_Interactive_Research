@@ -6,11 +6,15 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import CoinDisplay from '../components/CoinDisplay';
 import React from 'react';
+import TutorChat from '../components/TutorChat';
+import { useHighlights, HighlightedText, AnnotateControls } from '../components/Highlight';
+import * as Speech from 'expo-speech';
 
 type Problem = {
   id: string;
@@ -41,6 +45,12 @@ export default function MathScreen() {
   const [coinRefresh, setCoinRefresh] = useState(0);
   const [completedCount, setCompletedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
+  const [showChat, setShowChat] = useState(false);
+
+  const highlight = useHighlights(problem?.id ?? '');
+
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [rate, setRate] = useState(1.0);
 
   useEffect(() => {
     fetchProblem();
@@ -52,6 +62,7 @@ export default function MathScreen() {
     setAnswered(false);
     setWasCorrect(false);
     setSelected(null);
+    setShowChat(false);
 
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
@@ -168,6 +179,38 @@ export default function MathScreen() {
     }
   };
 
+  useEffect(() => {
+      Speech.stop();
+      setIsSpeaking(false);
+    }, [problem?.id]);
+  
+    useEffect(() => {
+      return () => {
+        Speech.stop();
+      };
+    }, []);
+  
+    const handleSpeak = () => {
+      if (!problem) return;
+  
+      if (isSpeaking) {
+        Speech.stop();
+        setIsSpeaking(false);
+        return;
+      }
+  
+      setIsSpeaking(true);
+      Speech.speak(problem.question, {
+        language: 'en-US',
+        pitch: 1.0,
+        rate,
+        voice: "urn:moz-tts:osx:com.apple.voice.compact.en-US.Samantha",
+        onStopped: () => setIsSpeaking(false),
+        onError: () => setIsSpeaking(false),
+      });
+    };
+  
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -194,83 +237,138 @@ export default function MathScreen() {
     { letter: 'd', text: problem.choice_d },
   ];
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.topBar}>
-        <CoinDisplay refreshKey={coinRefresh} fontSize={40} />
-        <Text style={styles.progress}>
-          {completedCount} / {totalCount} Questions Completed
-        </Text>
+  const mainContent = (
+    <>
+      <View style={styles.questionColumn}>
+        <HighlightedText
+          text={problem.question}
+          highlights={highlight.highlights}
+          onWordPress={highlight.handleWordPress}
+          style={styles.question}
+        />
       </View>
-
-      <View style={styles.mainRow}>
-        <View style={styles.questionColumn}>
-          <Text style={styles.question}>{problem.question}</Text>
+  
+      <View style={styles.feedbackButtonRow}>
+        <View style={styles.speakRow}>
+        <TouchableOpacity style={styles.chatToggleButton} onPress={handleSpeak}>
+          <Image
+            source={require('../assets/speech.png')}
+            style={styles.icon}
+          />
+        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.rateButton}
+            onPress={() => setRate((r) => Math.max(0.5, r - 0.25))}
+          >
+            <Text style={styles.rateButtonText}>Slower</Text>
+          </TouchableOpacity>
+          <Text style={styles.rateButtonText}>{rate.toFixed(2)}x</Text>
+          <TouchableOpacity
+            style={styles.rateButton}
+            onPress={() => setRate((r) => Math.min(1.5, r + 0.25))}
+          >
+            <Text style={styles.rateButtonText}>Faster</Text>
+          </TouchableOpacity>
         </View>
-
-        <View style={styles.choicesColumn}>
-          {choices.map((choice) => {
-            const isCorrect = choice.letter === problem.correct_answer;
-            const isSelected = choice.letter === selected;
-
-            let backgroundColor = '#A7C7E7';
-
-            if (answered) {
-              if (isCorrect) backgroundColor = '#4CAF50';
-              else if (isSelected) backgroundColor = '#F44336';
-              else backgroundColor = '#ccc';
-            } else if (wrongChoices.includes(choice.letter)) {
-              backgroundColor = '#ccc';
-            }
-
-            return (
-              <TouchableOpacity
-                key={choice.letter}
-                style={[styles.choiceButton, { backgroundColor }]}
-                onPress={() => handleSelect(choice.letter)}
-                disabled={answered || wrongChoices.includes(choice.letter)}
-              >
-                <Text style={styles.choiceText}>{choice.text}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        <View style={styles.feedbackColumn}>
-          {!answered && wrongChoices.length === 1 && (
-            <Text style={styles.wrong}>Incorrect, try again!</Text>
-          )}
-
-          {answered && (
-            <>
-              <Text
-                style={
-                  selected === problem.correct_answer
-                    ? styles.correct
-                    : styles.wrong
-                }
-              >
-                {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
-              </Text>
-
-              <Text style={styles.explanation}>
-                {problem.explanation.split("\n").map((line, index) => (
-                  <React.Fragment key={index}>
-                    {line}
-                    {"\n"}
-                  </React.Fragment>
-                ))}
-              </Text>
-
-              <TouchableOpacity style={styles.continueButton} onPress={fetchProblem}>
-                <Text style={styles.buttonText}>Continue</Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
+        {!showChat && (
+          <TouchableOpacity style={styles.chatToggleButton} onPress={() => setShowChat(true)}>
+            <Image
+              source={require('../assets/typing.png')}
+              style={styles.icon}
+            />
+          </TouchableOpacity>
+        )}
+        <AnnotateControls
+          showTools={highlight.showTools}
+          toggleShowTools={highlight.toggleShowTools}
+          activeColor={highlight.activeColor}
+          setActiveColor={highlight.setActiveColor}
+          onUndo={highlight.handleUndo}
+          canUndo={highlight.canUndo}
+        />
       </View>
-    </ScrollView>
+  
+      <View style={styles.choicesColumn}>
+        {choices.map((choice) => {
+          const isCorrect = choice.letter === problem.correct_answer;
+          const isSelected = choice.letter === selected;
+  
+          let backgroundColor = '#A7C7E7';
+  
+          if (answered) {
+            if (isCorrect) backgroundColor = '#4CAF50';
+            else if (isSelected) backgroundColor = '#F44336';
+            else backgroundColor = '#ccc';
+          } else if (wrongChoices.includes(choice.letter)) {
+            backgroundColor = '#ccc';
+          }
+  
+          return (
+            <TouchableOpacity
+              key={choice.letter}
+              style={[styles.choiceButton, { backgroundColor }]}
+              onPress={() => handleSelect(choice.letter)}
+              disabled={answered || wrongChoices.includes(choice.letter)}
+            >
+              <Text style={styles.choiceText}>{choice.text}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+  
+      <View style={styles.feedbackColumn}>
+        {!answered && wrongChoices.length === 1 && (
+          <Text style={styles.wrong}>Incorrect, try again!</Text>
+        )}
+  
+        {answered && (
+          <>
+            <Text style={selected === problem.correct_answer ? styles.correct : styles.wrong}>
+              {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
+            </Text>
+  
+            <Text style={styles.explanation}>
+              {problem.explanation.split('\n').map((line, index) => (
+                <React.Fragment key={index}>
+                  {line}
+                  {'\n'}
+                </React.Fragment>
+              ))}
+            </Text>
+  
+            <TouchableOpacity style={styles.continueButton} onPress={fetchProblem}>
+              <Text style={styles.buttonText}>Continue</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+    </>
   );
+
+  return (
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.topBar}>
+          <CoinDisplay refreshKey={coinRefresh} fontSize={40} />
+          <Text style={styles.progress}>
+            {completedCount} / {totalCount} Questions Completed
+          </Text>
+        </View>
+  
+      {showChat ? (
+      <View style={styles.outerRow}>
+          <View style={[styles.mainRow, styles.mainRowShrunk]}>{mainContent}</View>
+  
+          <TutorChat
+            problem={problem}
+            subject="Math"
+            onClose={() => setShowChat(false)}
+          />
+          </View>
+        ) : (
+            <View style={styles.mainRow}>{mainContent}</View>
+        )}
+      </ScrollView>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -331,22 +429,15 @@ const styles = StyleSheet.create({
   wrong: {
     color: 'red',
     fontSize: 50,
-    marginTop: 12,
+    marginVertical: 12,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   explanation: {
     fontSize: 50,
-    marginTop: 8,
+    marginVertical: 8,
     textAlign: 'center',
     color: '#4d3b2c',
-  },
-  continueButton: {
-    marginTop: 12,
-    backgroundColor: '#A7C7E7',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 6,
   },
   buttonText: {
     color: 'white',
@@ -368,5 +459,52 @@ const styles = StyleSheet.create({
   feedbackColumn: {
     alignItems: 'center',
     marginTop: 20,
+  },
+  outerRow: {
+    flexDirection: 'row',
+    width: '100%',
+    alignItems: 'stretch',
+    height: 800,
+  },
+  mainRowShrunk: {
+    flex: 0.66,
+  },
+  feedbackButtonRow: {
+    flexDirection: 'row',
+    gap: 20,
+    marginTop: 12,
+  },
+  chatToggleButton: {
+    backgroundColor: '#8a7f79',
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    borderRadius: 50,
+    justifyContent: 'center',
+  },
+  continueButton: {
+    backgroundColor: '#A7C7E7',
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    borderRadius: 6,
+  },
+  speakRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  rateButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+  },
+  rateButtonText: {
+    color: '#4d3b2c',
+    fontSize: 15,
+  },
+  icon: {
+    width: 50,
+    height: 50,
+    resizeMode: 'contain',
   },
 });

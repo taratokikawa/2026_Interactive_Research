@@ -184,7 +184,7 @@ export default function PracticeHub() {
                 onPress={() => router.push('/English?difficulty=easy')}
               >
                 <Text style={styles.buttonText}>EASY</Text>
-                <Text style={styles.coinSubtext}>5 coin per question</Text>
+                <Text style={styles.coinSubtext}>5 coins per question</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -217,7 +217,7 @@ export default function PracticeHub() {
 
             <View style={styles.shopRow}>
               <CorrectCountDisplay refreshKey={avatarRefresh} fontSize={28} />
-              <Text style={{ fontSize: 28, marginVertical: 10, color: '#4d3b2c' }}> | </Text>
+              <Text style={{ fontSize: 28, marginVertical: 10, color: '#4d3b2c' }}>  </Text>
               <CoinDisplay fontSize={28} />
 
               <TouchableOpacity
@@ -225,6 +225,9 @@ export default function PracticeHub() {
                 onPress={() => router.push('/Shop')}
               >
                 <Text style={styles.shopButtonText}>Shop</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/TutorRequest')}>
+                <Text style={styles.shopButtonText}>Find a Tutor</Text>
               </TouchableOpacity>
             </View>
 
@@ -401,7 +404,7 @@ bottomColumn: {
     borderRadius: 6,
     paddingHorizontal: 20,
     alignItems: 'center',
-    marginLeft: 20,
+    marginLeft: 30,
   },
   feedbackButton: {
     backgroundColor: '#A7C7E7',

@@ -4,7 +4,6 @@ import {
   Text,
   View,
   ActivityIndicator,
-  TouchableOpacity,
   ScrollView,
   Image,
 } from 'react-native';
@@ -16,6 +15,7 @@ import TutorChat from '../components/TutorChat';
 import { useHighlights, HighlightedText, AnnotateControls } from '../components/Highlight';
 import * as Speech from 'expo-speech';
 import StreakDisplay from '../components/StreakDisplay';
+import HoverScaleButton from '../components/HoverScaleButton';
 
 type Problem = {
   id: string;
@@ -230,9 +230,9 @@ export default function MathScreen() {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>You've completed all {difficulty} questions!</Text>
-        <TouchableOpacity style={styles.continueButton} onPress={() => router.replace('/PracticeHub')}>
+        <HoverScaleButton style={styles.continueButton} onPress={() => router.replace('/PracticeHub')}>
           <Text style={styles.buttonText}>Return to Hub</Text>
-        </TouchableOpacity>
+        </HoverScaleButton>
       </View>
     );
   }
@@ -257,33 +257,33 @@ export default function MathScreen() {
   
       <View style={styles.feedbackButtonRow}>
         <View style={styles.speakRow}>
-        <TouchableOpacity style={styles.chatToggleButton} onPress={handleSpeak}>
+        <HoverScaleButton style={styles.chatToggleButton} onPress={handleSpeak}>
           <Image
             source={require('../assets/speech.png')}
             style={styles.icon}
           />
-        </TouchableOpacity>
-          <TouchableOpacity
+        </HoverScaleButton>
+          <HoverScaleButton
             style={styles.rateButton}
             onPress={() => setRate((r) => Math.max(0.5, r - 0.25))}
           >
             <Text style={styles.rateButtonText}>Slower</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
           <Text style={styles.rateButtonText}>{rate.toFixed(2)}x</Text>
-          <TouchableOpacity
+          <HoverScaleButton
             style={styles.rateButton}
             onPress={() => setRate((r) => Math.min(1.5, r + 0.25))}
           >
             <Text style={styles.rateButtonText}>Faster</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
         </View>
         {!showChat && (
-          <TouchableOpacity style={styles.chatToggleButton} onPress={() => setShowChat(true)}>
+          <HoverScaleButton style={styles.chatToggleButton} onPress={() => setShowChat(true)}>
             <Image
               source={require('../assets/typing.png')}
               style={styles.icon}
             />
-          </TouchableOpacity>
+          </HoverScaleButton>
         )}
         <AnnotateControls
           showTools={highlight.showTools}
@@ -311,14 +311,15 @@ export default function MathScreen() {
           }
   
           return (
-            <TouchableOpacity
+            <HoverScaleButton
               key={choice.letter}
+              containerStyle={styles.choiceButtonContainer}
               style={[styles.choiceButton, { backgroundColor }]}
               onPress={() => handleSelect(choice.letter)}
               disabled={answered || wrongChoices.includes(choice.letter)}
             >
               <Text style={styles.choiceText}>{choice.text}</Text>
-            </TouchableOpacity>
+            </HoverScaleButton>
           );
         })}
       </View>
@@ -357,9 +358,9 @@ export default function MathScreen() {
               ))}
             </Text>
   
-            <TouchableOpacity style={styles.continueButton} onPress={fetchProblem}>
+            <HoverScaleButton style={styles.continueButton} onPress={fetchProblem}>
               <Text style={styles.buttonText}>Continue</Text>
-            </TouchableOpacity>
+            </HoverScaleButton>
           </>
         )}
       </View>
@@ -430,15 +431,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#4d3b2c',
   },
-  choiceButton: {
+  choiceButtonContainer: {
     width: '48%',
+    marginVertical: 10,
+  },
+  choiceButton: {
     minHeight: 100,
     padding: 14,
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#A7C7E7',
-    marginVertical: 10,
   },
   choiceText: {
     color: 'white',

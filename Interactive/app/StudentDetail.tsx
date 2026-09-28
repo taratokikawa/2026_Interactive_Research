@@ -217,7 +217,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   emptyText: {
-    color: 'white',
-    fontStyle: 'italic',
+    color: '#8a7f79',
   },
 });

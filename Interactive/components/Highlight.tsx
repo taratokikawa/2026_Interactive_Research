@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextStyle, StyleProp, Image } from 'react-native';
-
+import HoverScaleButton from '../components/HoverScaleButton';
 
 export type HighlightColor = 'yellow' | 'blue' | 'pink';
 
@@ -115,18 +115,19 @@ export function AnnotateControls({
 }: AnnotateControlsProps) {
   return (
     <View style={styles.row}>
-      <TouchableOpacity style={styles.annotateButton} onPress={toggleShowTools}>
+      <HoverScaleButton style={styles.annotateButton} onPress={toggleShowTools}>
         <Image
           source={require('../assets/marker.png')}
           style={styles.icon}
         />
-      </TouchableOpacity>
+      </HoverScaleButton>
 
       {showTools && (
         <>
           {(Object.keys(HIGHLIGHT_COLOR_MAP) as HighlightColor[]).map((color) => (
-            <TouchableOpacity
+            <HoverScaleButton
               key={color}
+              scaleTo={1.2}
               style={[
                 styles.colorSwatch,
                 { backgroundColor: HIGHLIGHT_COLOR_MAP[color] },
@@ -136,13 +137,13 @@ export function AnnotateControls({
             />
           ))}
 
-          <TouchableOpacity
+          <HoverScaleButton
             style={[styles.undoButton, !canUndo && styles.undoButtonDisabled]}
             onPress={onUndo}
             disabled={!canUndo}
           >
             <Text style={styles.undoButtonText}>Undo</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
         </>
       )}
     </View>
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
   },
   undoButtonText: {
     color: '#4d3b2c',
-    fontSize: 30,
+    fontSize: 25,
   },
   colorSwatch: {
     width: 28,

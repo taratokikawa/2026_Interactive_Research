@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image, Modal, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import HoverScaleButton from '../components/HoverScaleButton';
 
 export default function Home() {
   const router = useRouter();
@@ -21,9 +22,10 @@ export default function Home() {
             <Text style={styles.modalText}>2. Complete the learning type survey</Text>
             <Text style={styles.modalText}>3. Use the recommended resources to enhance your learning</Text>
             <Text style={styles.modalText}>4. Hone skills through problems in the practice hub</Text>
-            <TouchableOpacity style={styles.modalButton} onPress={() => setShowTutorial(false)}>
+            <Text style={styles.modalText}>5. Build your daily streak, spend coins, and climb the leaderboard!</Text>
+            <HoverScaleButton style={styles.modalButton} onPress={() => setShowTutorial(false)}>
               <Text style={styles.modalButtonText}>Back to Home</Text>
-            </TouchableOpacity>
+            </HoverScaleButton>
           </View>
         </View>
       </Modal>
@@ -32,17 +34,17 @@ export default function Home() {
         <View style={styles.column}>
           <Text style={styles.title}>The Ducktor</Text>
 
-          <TouchableOpacity style={styles.button} onPress={() => router.push('/Login')}>
+          <HoverScaleButton style={styles.button} onPress={() => router.push('/Login')}>
             <Text style={styles.buttonText}>Login</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
 
-          <TouchableOpacity style={styles.button} onPress={() => router.push('/SignUp')}>
+          <HoverScaleButton style={styles.button} onPress={() => router.push('/SignUp')}>
             <Text style={styles.buttonText}>Sign Up</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
 
-          <TouchableOpacity style={styles.button} onPress={() => setShowTutorial(true)}>
+          <HoverScaleButton style={styles.button} onPress={() => setShowTutorial(true)}>
             <Text style={styles.buttonText}>Tutorial</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
         </View>
 
         <Image source={require('../assets/items/ducktor.png')} style={styles.duck} />

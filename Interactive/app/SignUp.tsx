@@ -4,11 +4,11 @@ import {
   Text,
   View,
   TextInput,
-  TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
+import HoverScaleButton from '../components/HoverScaleButton';
 
 export default function SignUp() {
   const [username, setUsername] = useState('');
@@ -99,14 +99,14 @@ export default function SignUp() {
         </Text>
       ) : null}
 
-      <TouchableOpacity
+      <HoverScaleButton
         style={styles.button}
         onPress={handleSignUp}
       >
         <Text style={styles.buttonText}>
           Continue
         </Text>
-      </TouchableOpacity>
+      </HoverScaleButton>
 
     </View>
   );

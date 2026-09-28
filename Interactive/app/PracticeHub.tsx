@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal, useWindowDimensions } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import CoinDisplay from '../components/CoinDisplay';
@@ -7,6 +7,7 @@ import AvatarPreview from '../components/AvatarPreview';
 import { supabase } from '../lib/supabase';
 import CorrectCountDisplay from '../components/CorrectCountDisplay';
 import StreakDisplay from '../components/StreakDisplay';
+import HoverScaleButton from '../components/HoverScaleButton';
 
 export default function PracticeHub() {
   const router = useRouter();
@@ -119,31 +120,31 @@ export default function PracticeHub() {
         )}
 
       <View style={styles.topBar}>
-        <TouchableOpacity style={styles.topBarButton} onPress={handleSignOut}>
+        <HoverScaleButton style={styles.topBarButton} onPress={handleSignOut}>
           <Text style={styles.topBarButtonText}>{'<'} Sign Out</Text>
-        </TouchableOpacity>
+        </HoverScaleButton>
 
         <View style={styles.topBarRight}>
-          <TouchableOpacity
+          <HoverScaleButton
             style={styles.topBarButton}
             onPress={() => router.push(`/Diagnosis?diagnosis=${currentDiagnosis}`)}
           >
             <Text style={styles.topBarButtonText}>
               {currentDiagnosis ?? '...'} Learning Prescription
             </Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
 
-          <TouchableOpacity style={styles.topBarButton} onPress={() => router.push('/Survey')}>
+          <HoverScaleButton style={styles.topBarButton} onPress={() => router.push('/Survey')}>
             <Text style={styles.topBarButtonText}>Retake Symptom Survey</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
 
-          <TouchableOpacity style={styles.topBarButton} onPress={() => router.push('/Feedback')}>
+          <HoverScaleButton style={styles.topBarButton} onPress={() => router.push('/Feedback')}>
             <Text style={styles.topBarButtonText}>Anonymous Feedback Form</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
 
-           <TouchableOpacity style={styles.topBarButton} onPress={() => router.push('/TutorRequest')}>
+           <HoverScaleButton style={styles.topBarButton} onPress={() => router.push('/TutorRequest')}>
             <Text style={styles.topBarButtonText}>Find a Tutor</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
         </View>
       </View>
 
@@ -155,58 +156,58 @@ export default function PracticeHub() {
           <View style={styles.column}>
             <Text style={styles.sectionTitle}>Math</Text>
             <View style={styles.difficultyRow}>
-              <TouchableOpacity
+              <HoverScaleButton
                 style={styles.fillButton}
                 onPress={() => router.push('/Math?difficulty=easy')}
               >
                 <Text style={styles.buttonText}>EASY</Text>
                 <Text style={styles.coinSubtext}>5 coins per question</Text>
-              </TouchableOpacity>
+              </HoverScaleButton>
 
-              <TouchableOpacity
+              <HoverScaleButton
                 style={styles.fillButton}
                 onPress={() => router.push('/Math?difficulty=medium')}
               >
                 <Text style={styles.buttonText}>MEDIUM</Text>
                 <Text style={styles.coinSubtext}>10 coins per question</Text>
-              </TouchableOpacity>
+              </HoverScaleButton>
 
-              <TouchableOpacity
+              <HoverScaleButton
                 style={styles.fillButton}
                 onPress={() => router.push('/Math?difficulty=hard')}
               >
                 <Text style={styles.buttonText}>HARD</Text>
                 <Text style={styles.coinSubtext}>25 coins per question</Text>
-              </TouchableOpacity>
+              </HoverScaleButton>
             </View>
           </View>
 
           <View style={styles.column}>
             <Text style={styles.sectionTitle}>English</Text>
             <View style={styles.difficultyRow}>
-              <TouchableOpacity
+              <HoverScaleButton
                 style={styles.fillButton}
                 onPress={() => router.push('/English?difficulty=easy')}
               >
                 <Text style={styles.buttonText}>EASY</Text>
                 <Text style={styles.coinSubtext}>5 coins per question</Text>
-              </TouchableOpacity>
+              </HoverScaleButton>
 
-              <TouchableOpacity
+              <HoverScaleButton
                 style={styles.fillButton}
                 onPress={() => router.push('/English?difficulty=medium')}
               >
                 <Text style={styles.buttonText}>MEDIUM</Text>
                 <Text style={styles.coinSubtext}>10 coins per question</Text>
-              </TouchableOpacity>
+              </HoverScaleButton>
 
-              <TouchableOpacity
+              <HoverScaleButton
                 style={styles.fillButton}
                 onPress={() => router.push('/English?difficulty=hard')}
               >
                 <Text style={styles.buttonText}>HARD</Text>
                 <Text style={styles.coinSubtext}>25 coins per question</Text>
-              </TouchableOpacity>
+              </HoverScaleButton>
             </View>
           </View>
         </View>
@@ -225,15 +226,15 @@ export default function PracticeHub() {
               <CoinDisplay fontSize={28}/>
               <StreakDisplay fontSize={28} refreshKey={avatarRefresh} />
 
-              <TouchableOpacity
+              <HoverScaleButton
                 style={styles.shopButton}
                 onPress={() => router.push('/Shop')}
               >
                 <Text style={styles.shopButtonText}>Shop</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/MyTutorRequests')}>
+              </HoverScaleButton>
+              <HoverScaleButton style={styles.shopButton} onPress={() => router.push('/MyTutorRequests')}>
                   <Text style={styles.shopButtonText}>My Requests</Text>
-                </TouchableOpacity>
+                </HoverScaleButton>
             </View>
 
             <View style={styles.row}>
@@ -270,14 +271,14 @@ export default function PracticeHub() {
 
                           <Text style={styles.itemName}>{item.name}</Text>
 
-                          <TouchableOpacity
+                          <HoverScaleButton
                             style={styles.button}
                             onPress={() => handleEquip(item)}
                           >
                             <Text style={styles.buttonText}>
                               {isEquipped ? 'Unequip' : 'Equip'}
                             </Text>
-                          </TouchableOpacity>
+                          </HoverScaleButton>
                         </View>
                       );
                     })

@@ -3,15 +3,15 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   StyleSheet,
   ScrollView,
   Alert,
-  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import DateTimeField from '../components/DateTimeField';
+import HoverScaleButton from '../components/HoverScaleButton';
+
 
 export default function TutorRequest() {
   const router = useRouter();
@@ -106,7 +106,7 @@ export default function TutorRequest() {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <TouchableOpacity
+      <HoverScaleButton
         style={[styles.shopButton, submitting && styles.shopButtonDisabled]}
         onPress={handleSubmit}
         disabled={submitting}
@@ -114,7 +114,7 @@ export default function TutorRequest() {
         <Text style={styles.shopButtonText}>
           {submitting ? 'Submitting...' : 'Submit Request'}
         </Text>
-      </TouchableOpacity>
+      </HoverScaleButton>
     </ScrollView>
   );
 }

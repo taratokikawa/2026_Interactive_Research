@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
+import HoverScaleButton from '../components/HoverScaleButton';
 
 const MAX_CHARS = 500;
 
@@ -25,7 +26,7 @@ export default function Feedback() {
         <Text style={styles.ratingSubtitle}>{subtitle}</Text>
         <View style={styles.ratingRow}>
         {[1, 2, 3, 4, 5].map((num) => (
-          <TouchableOpacity
+          <HoverScaleButton
             key={num}
             style={[styles.ratingButton, value === num && styles.ratingButtonSelected]}
             onPress={() => setValue(num)}
@@ -38,7 +39,7 @@ export default function Feedback() {
             >
             {num}
             </Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
         ))}
       </View>
     </View>
@@ -78,9 +79,9 @@ export default function Feedback() {
       <View style={styles.container}>
         <Text style={styles.title}>Thank You!</Text>
         <Text style={styles.thankYouText}>Your form has been succesfully submitted. We appreciate your feedback!</Text>
-        <TouchableOpacity style={styles.submitButton} onPress={() => router.replace('/PracticeHub')}>
+        <HoverScaleButton style={styles.submitButton} onPress={() => router.replace('/PracticeHub')}>
           <Text style={styles.buttonText}>Return to Hub</Text>
-        </TouchableOpacity>
+        </HoverScaleButton>
       </View>
     );
   }
@@ -117,9 +118,9 @@ export default function Feedback() {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+      <HoverScaleButton style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Submit Feedback</Text>
-      </TouchableOpacity>
+      </HoverScaleButton>
     </ScrollView>
   );
 }

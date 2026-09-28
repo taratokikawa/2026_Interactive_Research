@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity,
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
@@ -15,6 +14,8 @@ import {
   SurveyQuestion,
 } from '../components/surveyQuestions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import HoverScaleButton from '../components/HoverScaleButton';
+
 
 function shuffleArray<T>(array: T[]): T[] {
   const arr = [...array];
@@ -184,7 +185,7 @@ export default function Survey() {
               const selected = answers[q.id] === option.value;
 
               return (
-                <TouchableOpacity
+                <HoverScaleButton
                   key={option.value}
                   style={[
                     styles.likertButton,
@@ -200,7 +201,7 @@ export default function Survey() {
                   >
                     {option.label}
                   </Text>
-                </TouchableOpacity>
+                </HoverScaleButton>
               );
             })}
           </View>
@@ -211,19 +212,19 @@ export default function Survey() {
         <>
         <View style={styles.row}>
           <Text style={styles.title}>Optional:</Text>
-          <TouchableOpacity
+          <HoverScaleButton
             style={styles.submitButton}
             onPress={() => router.push('/TutorRequest')}
           >
             <Text style={styles.buttonText}>Find a Tutor</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
         </View>
         </>
       )}
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <TouchableOpacity
+      <HoverScaleButton
         style={styles.submitButton}
         onPress={handleSubmit}
         disabled={submitting}
@@ -231,7 +232,7 @@ export default function Survey() {
         <Text style={styles.buttonText}>
           {submitting ? 'Submitting...' : 'Submit Survey'}
         </Text>
-      </TouchableOpacity>
+      </HoverScaleButton>
     </ScrollView>
   );
 }

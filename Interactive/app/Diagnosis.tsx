@@ -11,6 +11,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { DIAGNOSIS_CONTENT } from '../components/diagnosisContent';
 import { PRESCRIPTION_CONTENT } from '../components/prescriptionContent';
 import { LINKS_CONTENT } from '../components/linksContent';
+import HoverScaleButton from '../components/HoverScaleButton';
 
 export default function Diagnosis() {
   const { diagnosis } = useLocalSearchParams<{ diagnosis: string }>();
@@ -82,12 +83,12 @@ export default function Diagnosis() {
         </View>
       </View>
 
-      <TouchableOpacity
+      <HoverScaleButton
         style={styles.button}
         onPress={() => router.replace('/PracticeHub')}
       >
         <Text style={styles.buttonText}>Continue to Practice Hub</Text>
-      </TouchableOpacity>
+      </HoverScaleButton>
     </ScrollView>
   );
 }
@@ -97,13 +98,12 @@ const desktopStyles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: '#FFE787',
     alignItems: 'center',
-    paddingHorizontal: 50,
     paddingVertical: 30,
   },
   mainRow: {
     flexDirection: 'row',
     width: '100%',
-    maxWidth: 1400,
+    maxWidth: 1600,
   },
   leftColumn: {
     flex: 0.5,

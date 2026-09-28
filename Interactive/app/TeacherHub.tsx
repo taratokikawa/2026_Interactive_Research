@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, ActivityIndicator, TouchableOpacity, Linking } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Linking } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { useRouter } from 'expo-router';
+import HoverScaleButton from '../components/HoverScaleButton';
 
 type UserStat = {
   username: string;
@@ -206,7 +207,7 @@ export default function TeacherHub() {
               return (
                 <View key={colIndex} style={styles.statColumn}>
                   {columnUsers.map((u, index) => (
-                    <TouchableOpacity
+                    <HoverScaleButton
                       key={index}
                       style={styles.card}
                       onPress={() =>
@@ -218,7 +219,7 @@ export default function TeacherHub() {
                       <Text style={styles.cardSubText}>
                         Correct: {u.correct_count} | Incorrect: {u.incorrect_count} | Coins: {u.coins}
                       </Text>
-                    </TouchableOpacity>
+                    </HoverScaleButton>
                   ))}
                 </View>
               );
@@ -227,12 +228,12 @@ export default function TeacherHub() {
         </View>
 
         {studentLimit < userStats.length && (
-          <TouchableOpacity
+          <HoverScaleButton
             style={styles.showMoreButton}
             onPress={() => setStudentLimit((prev) => prev + 18)}
           >
             <Text style={styles.showMoreText}>Show More Students</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
         )}
       </View>
       </View>
@@ -281,7 +282,7 @@ export default function TeacherHub() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Feedback Forms ({allFeedback.length})</Text>
-          <TouchableOpacity style={[styles.card, { height: 130 }]} onPress={() => router.push('/FeedbackDetail')}>
+          <HoverScaleButton style={[styles.card, { height: 155 }]} onPress={() => router.push('/FeedbackDetail')}>
             {latestFeedback ? (
               <>
                 <Text style={styles.cardText}>Latest Feedback</Text>
@@ -297,7 +298,7 @@ export default function TeacherHub() {
             ) : (
               <Text style={styles.cardText}>No feedback submitted yet.</Text>
             )}
-          </TouchableOpacity>
+          </HoverScaleButton>
         </View>
       </View>
       </View>
@@ -319,21 +320,21 @@ export default function TeacherHub() {
                   <Text style={styles.cardSubText}>Email: {request.profiles?.email}</Text>
 
                   {request.status === 'pending' && (
-                    <TouchableOpacity style={styles.showMoreButton} onPress={() => handleAccept(request)}>
+                    <HoverScaleButton style={styles.showMoreButton} onPress={() => handleAccept(request)}>
                       <Text style={styles.showMoreText}>Accept</Text>
-                    </TouchableOpacity>
+                    </HoverScaleButton>
                   )}
                 </View>
               ))}
             </View>
 
             {tutorRequestLimit < tutorRequests.length && (
-              <TouchableOpacity
+              <HoverScaleButton
                 style={styles.showMoreButton}
                 onPress={() => setTutorRequestLimit((prev) => prev + 3)}
               >
                 <Text style={styles.showMoreText}>Show More Requests</Text>
-              </TouchableOpacity>
+              </HoverScaleButton>
             )}
           </>
         )}
@@ -443,10 +444,11 @@ const styles = StyleSheet.create({
   statsColumns: {
     flexDirection: 'row',
     width: '100%',
-    gap: 10,
+    gap: 15,
   },
   statColumn: {
     flex: 1,
+    gap: 5,
   },
   showMoreButton: {
     alignSelf: 'center',

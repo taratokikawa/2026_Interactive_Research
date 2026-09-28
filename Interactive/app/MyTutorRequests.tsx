@@ -5,10 +5,10 @@ import {
   View,
   ScrollView,
   ActivityIndicator,
-  TouchableOpacity,
   Linking,
 } from 'react-native';
 import { supabase } from '../lib/supabase';
+import HoverScaleButton from '../components/HoverScaleButton';
 
 type MyTutorRequestRow = {
   id: string;
@@ -101,12 +101,12 @@ export default function MyTutorRequests() {
           {request.profiles?.email && (
             <Text style={styles.cardSubText}>Email: {request.profiles.email}</Text>
           )}
-          <TouchableOpacity
+          <HoverScaleButton
             style={styles.showMoreButton}
             onPress={() => Linking.openURL(buildGoogleCalendarUrl(request))}
           >
             <Text style={styles.showMoreText}>Add to Calendar</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
         </>
       )}
     </View>

@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator, Image } fr
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import MiniAvatar from './MiniAvatar';
+import HoverScaleButton from '../components/HoverScaleButton';
 
 type LeaderboardEntry = {
   username: string;
@@ -37,7 +38,7 @@ export default function MiniLeaderboard() {
   }
 
   return (
-    <TouchableOpacity style={styles.container} onPress={() => router.push('/Leaderboard')}>
+    <HoverScaleButton style={styles.container} onPress={() => router.push('/Leaderboard')}>
       {entries.map((entry, index) => (
         <View key={index} style={styles.row}>
           <Text style={styles.rank}>{index + 1}.</Text>
@@ -57,7 +58,7 @@ export default function MiniLeaderboard() {
           </View>
         </View>
       ))}
-    </TouchableOpacity>
+    </HoverScaleButton>
   );
 }
 

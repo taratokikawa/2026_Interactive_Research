@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { supabase } from '../lib/supabase';
 import CoinDisplay from '../components/CoinDisplay';
 import AvatarPreview from '../components/AvatarPreview';
+import HoverScaleButton from '../components/HoverScaleButton';
 
 type ShopItem = {
   id: string;
@@ -129,13 +130,13 @@ export default function Shop() {
         <Text style={styles.itemName}>{item.name}</Text>
         <Text style={styles.itemPrice}>{item.price} coins</Text>
         {owned ? (
-          <TouchableOpacity style={styles.button} onPress={() => handleEquip(item)}>
+          <HoverScaleButton style={styles.button} onPress={() => handleEquip(item)}>
             <Text style={styles.buttonText}>{isEquipped ? 'Unequip' : 'Equip'}</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
         ) : (
-          <TouchableOpacity style={styles.button} onPress={() => handlePurchase(item)}>
+          <HoverScaleButton style={styles.button} onPress={() => handlePurchase(item)}>
             <Text style={styles.buttonText}>Buy</Text>
-          </TouchableOpacity>
+          </HoverScaleButton>
         )}
       </View>
     );

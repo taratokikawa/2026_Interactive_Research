@@ -10,6 +10,7 @@ type LeaderboardEntry = {
   questions_correct: number;
   shirt_worn_image_key: string | null;
   hat_worn_image_key: string | null;
+  current_streak: number;
 };
 
 export default function MiniLeaderboard() {
@@ -46,8 +47,13 @@ export default function MiniLeaderboard() {
             <Text style={styles.subtext}>
               {entry.questions_correct} correct    
             </Text>
-            <Image source={require('../assets/duck_coin.png')} style={styles.coinImage}/>
+            <Image source={require('../assets/duck_coin.png')} style={styles.coinImage} />
             <Text style={styles.subtext}>{entry.coins}</Text>
+            <Image
+              source={require('../assets/flame.png')}
+              style={styles.flameIcon}
+            />
+            <Text style={styles.subtext}>{entry.current_streak}</Text>
           </View>
         </View>
       ))}
@@ -77,14 +83,14 @@ const styles = StyleSheet.create({
   },
   username: {
     flex: 1,
-    paddingTop: 8,
-    fontSize: 40,
+    paddingTop: 15,
+    fontSize: 35,
     marginLeft: 8,
     color: '#4d3b2c',
   },
   subtext: {
-    marginRight: 20,
-    fontSize: 25,
+    marginRight: 12,
+    fontSize: 22,
     color: '#8a7f79',
   },
   subtextContainer: {
@@ -92,8 +98,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   coinImage: {
-    width: 30,
-    height: 40,
+    width: 27,
+    height: 35,
+    marginHorizontal: 4,
+  },
+  flameIcon: {
+    width: 27,
+    height: 27,
     marginRight: 4,
   },
 });

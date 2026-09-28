@@ -316,6 +316,7 @@ export default function TeacherHub() {
                   <Text style={styles.cardSubText}>Start: {formatReadable(request.proposed_start)}</Text>
                   <Text style={styles.cardSubText}>End: {formatReadable(request.proposed_end)}</Text>
                   <Text style={styles.cardSubText}>From: {request.profiles?.username}</Text>
+                  <Text style={styles.cardSubText}>Email: {request.profiles?.email}</Text>
 
                   {request.status === 'pending' && (
                     <TouchableOpacity style={styles.showMoreButton} onPress={() => handleAccept(request)}>

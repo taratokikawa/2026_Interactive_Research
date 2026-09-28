@@ -20,14 +20,15 @@ export default function TutorRequest() {
   const [proposedStart, setProposedStart] = useState(new Date());
   const [proposedEnd, setProposedEnd] = useState(new Date(Date.now() + 60 * 60 * 1000));
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async () => {
     if (!subject.trim()) {
-      Alert.alert('Missing info', 'Please enter a subject.');
+      setError('Please enter a subject.');
       return;
     }
     if (proposedEnd <= proposedStart) {
-      Alert.alert('Check the times', 'End time needs to be after the start time.');
+      setError('End time needs to be after the start time.');
       return;
     }
 
@@ -51,7 +52,7 @@ export default function TutorRequest() {
     setSubmitting(false);
 
     if (error) {
-      Alert.alert('Error', 'Could not submit your request. Please try again.');
+      setError('Could not submit your request. Please try again.');
       return;
     }
 
@@ -102,6 +103,9 @@ export default function TutorRequest() {
           />
         </View>
       </View>
+
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
       <TouchableOpacity
         style={[styles.shopButton, submitting && styles.shopButtonDisabled]}
         onPress={handleSubmit}
@@ -173,5 +177,12 @@ const styles = StyleSheet.create({
   shopButtonText: {
     color: '#fff',
     fontSize: 25,
+  },
+  error: {
+    color: 'red',
+    fontWeight: 'bold',
+    marginTop: 20,
+    fontSize: 20,
+    textAlign: 'center',
   },
 });

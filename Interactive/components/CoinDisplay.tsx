@@ -25,7 +25,7 @@ export default function CoinDisplay({ refreshKey, fontSize = 20 }: { refreshKey?
     <View style={styles.coinsContainer}>
       <Image source={require('../assets/duck_coin.png')} style={styles.coinImage}/>
       <Text style={[styles.coins, { fontSize }]}>
-        {coins ?? '...'}
+        {coins ?? '...'} 
       </Text>
     </View>
   );
@@ -33,17 +33,17 @@ export default function CoinDisplay({ refreshKey, fontSize = 20 }: { refreshKey?
 
 const styles = StyleSheet.create({
   coins: {
-    marginLeft: 10,
+    marginLeft: 5,
     color: '#4d3b2c',
+    marginRight: 8,
   },
   coinsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-
   coinImage: {
-    width: 40,
-    height: 50,
+    width: 36,
+    height: 45,
     marginLeft: 10,
   },
 });

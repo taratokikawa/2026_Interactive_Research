@@ -9,6 +9,7 @@ type LeaderboardEntry = {
   questions_correct: number;
   shirt_worn_image_key: string | null;
   hat_worn_image_key: string | null;
+  current_streak: number;
 };
 
 export default function Leaderboard() {
@@ -66,9 +67,14 @@ export default function Leaderboard() {
               <View style={styles.infoColumn}>
                 <Text style={styles.bigUsername}>{entry.username}</Text>
                 <View style={styles.bigStat}>
-                  <Text style={styles.bigStat}>{entry.questions_correct} correct  </Text>
+                  <Text style={styles.bigStat}>{entry.questions_correct} correct</Text>
                   <Image source={require('../assets/duck_coin.png')} style={styles.coinImageBig} />
                   <Text style={styles.bigStat}>{entry.coins}</Text>
+                  <Image
+                    source={require('../assets/flame.png')}
+                    style={styles.flameImageBig}
+                  />
+                  <Text style={styles.bigStat}>{entry.current_streak}</Text>
                 </View>
               </View>
             </View>
@@ -109,6 +115,12 @@ export default function Leaderboard() {
                 style={styles.coinImageSmall}
               />
               <Text style={styles.statRight}>{item.coins}</Text>
+              <Image
+                source={require('../assets/flame.png')}
+                style={styles.flameImageSmall}
+              />
+              <Text style={styles.statRight}>{item.current_streak}</Text>
+
             </View>
           </View>
         )}
@@ -208,11 +220,11 @@ const styles = StyleSheet.create({
     color: '#4d3b2c',
   },
   bigStat: {
-    fontSize: 30,
-    marginLeft: 5,
+    fontSize: 26,
     color: '#8a7f79',
     flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: 5,
   },
   skeletonRow: {
     backgroundColor: '#f0f0f0',
@@ -271,6 +283,17 @@ const styles = StyleSheet.create({
   coinImageBig: {
     width: 30,
     height: 40,
+    marginLeft: 12,
+  },
+  flameImageSmall: {
+    width: 15,
+    height: 20,
+    marginHorizontal: 2,
+    marginLeft: 8,
+  },
+  flameImageBig: {
+    width: 28,
+    height: 35,
     marginLeft: 12,
   },
   showMoreButton: {

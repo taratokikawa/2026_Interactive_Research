@@ -15,6 +15,7 @@ import React from 'react';
 import TutorChat from '../components/TutorChat';
 import { useHighlights, HighlightedText, AnnotateControls } from '../components/Highlight';
 import * as Speech from 'expo-speech';
+import StreakDisplay from '../components/StreakDisplay';
 
 type Problem = {
   id: string;
@@ -51,6 +52,12 @@ export default function MathScreen() {
 
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [rate, setRate] = useState(1.0);
+
+  const [lastAward, setLastAward] = useState<{
+    new_streak: number;
+    multiplier: number;
+    coins_awarded: number;
+  } | null>(null);
 
   useEffect(() => {
     fetchProblem();
@@ -326,6 +333,20 @@ export default function MathScreen() {
             <Text style={selected === problem.correct_answer ? styles.correct : styles.wrong}>
               {selected === problem.correct_answer ? 'Correct!' : 'Wrong!'}
             </Text>
+
+            {wasCorrect && lastAward && (
+              <View style={styles.coinAwardRow}>
+                <Text style={styles.buttonText}>+</Text>
+                <Image
+                  source={require('../assets/duck_coin.png')}
+                  style={styles.coinIcon}
+                />
+                <Text style={styles.buttonText}>{lastAward.coins_awarded} </Text>
+                <Text style={styles.buttonText}>
+                  ({lastAward.new_streak} day streak, {lastAward.multiplier.toFixed(1)}x bonus)
+                </Text>
+              </View>
+            )}
   
             <Text style={styles.explanation}>
               {problem.explanation.split('\n').map((line, index) => (
@@ -348,7 +369,10 @@ export default function MathScreen() {
   return (
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.topBar}>
-          <CoinDisplay refreshKey={coinRefresh} fontSize={40} />
+          <View style={styles.row}>
+            <CoinDisplay refreshKey={coinRefresh} fontSize={40} />
+            <StreakDisplay refreshKey={coinRefresh} fontSize={40} />
+          </View>
           <Text style={styles.progress}>
             {completedCount} / {totalCount} Questions Completed
           </Text>
@@ -376,6 +400,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: '#FFE787',
     padding: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 30,
   },
   topBar: {
     flexDirection: 'row',
@@ -422,20 +450,18 @@ const styles = StyleSheet.create({
   correct: {
     color: 'green',
     fontSize: 50,
-    marginTop: 12,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   wrong: {
     color: 'red',
     fontSize: 50,
-    marginVertical: 12,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   explanation: {
     fontSize: 50,
-    marginVertical: 8,
+    marginVertical: 10,
     textAlign: 'center',
     color: '#4d3b2c',
   },
@@ -505,6 +531,16 @@ const styles = StyleSheet.create({
   icon: {
     width: 50,
     height: 50,
+    resizeMode: 'contain',
+  },
+  coinAwardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  coinIcon: {
+    width: 50,
+    height: 60,
     resizeMode: 'contain',
   },
 });

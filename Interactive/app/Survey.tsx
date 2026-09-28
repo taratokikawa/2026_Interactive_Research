@@ -14,6 +14,7 @@ import {
   LIKERT_OPTIONS,
   SurveyQuestion,
 } from '../components/surveyQuestions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function shuffleArray<T>(array: T[]): T[] {
   const arr = [...array];
@@ -30,14 +31,71 @@ export default function Survey() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [isFirstTime, setIsFirstTime] = useState(false);
+  const SURVEY_PROGRESS_KEY = 'survey_progress';
 
   const { width } = useWindowDimensions();
   const isMobile = width < 700;
   const styles = isMobile ? mobileStyles : desktopStyles;
 
   useEffect(() => {
-    setQuestions(shuffleArray(SURVEY_QUESTIONS));
+    checkFirstTime();
+    loadProgress();
   }, []);
+
+  const loadProgress = async () => {
+    try {
+      const saved = await AsyncStorage.getItem(SURVEY_PROGRESS_KEY);
+
+      if (saved) {
+        const parsed = JSON.parse(saved) as {
+          order: string[];
+          answers: Record<string, number>;
+        };
+
+        const byId = Object.fromEntries(SURVEY_QUESTIONS.map((q) => [q.id, q]));
+        const restoredOrder = parsed.order
+          .map((id) => byId[id])
+          .filter((q): q is SurveyQuestion => Boolean(q));
+
+        const missing = SURVEY_QUESTIONS.filter((q) => !parsed.order.includes(q.id));
+
+        setQuestions([...restoredOrder, ...shuffleArray(missing)]);
+        setAnswers(parsed.answers ?? {});
+        return;
+      }
+    } catch (e) {
+      console.error('loadProgress error:', e);
+    }
+
+    setQuestions(shuffleArray(SURVEY_QUESTIONS));
+  };
+
+  useEffect(() => {
+    if (questions.length === 0) return;
+
+    AsyncStorage.setItem(
+      SURVEY_PROGRESS_KEY,
+      JSON.stringify({ order: questions.map((q) => q.id), answers })
+    ).catch((e) => console.error('saveProgress error:', e));
+  }, [answers, questions]);
+
+  const checkFirstTime = async () => {
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) return;
+
+    const { count, error } = await supabase
+      .from('learning_survey_results')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userData.user.id);
+
+    if (error) {
+      console.error('checkFirstTime error:', error.message);
+      return;
+    }
+
+    setIsFirstTime((count ?? 0) === 0);
+  };
 
   const handleSelect = (questionId: string, value: number) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
@@ -100,6 +158,8 @@ export default function Survey() {
       return;
     }
 
+    await AsyncStorage.removeItem(SURVEY_PROGRESS_KEY);
+
     router.replace(
       `/Diagnosis?diagnosis=${diagnosis}&audio=${audioScore}&visual=${visualScore}&readingWriting=${readingWritingScore}`
     );
@@ -147,6 +207,20 @@ export default function Survey() {
         </View>
       ))}
 
+      {isFirstTime && (
+        <>
+        <View style={styles.row}>
+          <Text style={styles.title}>Optional:</Text>
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={() => router.push('/TutorRequest')}
+          >
+            <Text style={styles.buttonText}>Find a Tutor</Text>
+          </TouchableOpacity>
+        </View>
+        </>
+      )}
+
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <TouchableOpacity
@@ -155,7 +229,7 @@ export default function Survey() {
         disabled={submitting}
       >
         <Text style={styles.buttonText}>
-          {submitting ? 'Submitting...' : 'Submit'}
+          {submitting ? 'Submitting...' : 'Submit Survey'}
         </Text>
       </TouchableOpacity>
     </ScrollView>
@@ -168,6 +242,10 @@ const desktopStyles = StyleSheet.create({
     backgroundColor: '#FFE787',
     padding: 20,
     alignItems: 'center',
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 20,
   },
   title: {
     fontSize: 60,
@@ -256,6 +334,10 @@ const mobileStyles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 20,
     alignItems: 'center',
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 10,
   },
   title: {
     fontSize: 42,

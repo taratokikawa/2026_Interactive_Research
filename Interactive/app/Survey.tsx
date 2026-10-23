@@ -171,7 +171,7 @@ export default function Survey() {
       <Text style={styles.title}>Symptom Check</Text>
 
       <Text style={styles.subtitle}>
-        Rate each statement on how much it applies to your learning experience
+        Rate each statement on how much it applies to your learning experience to help your tutor better understand your learning needs!
       </Text>
 
       {questions.map((q, index) => (

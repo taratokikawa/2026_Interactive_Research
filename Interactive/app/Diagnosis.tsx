@@ -39,19 +39,11 @@ export default function Diagnosis() {
           <Text style={styles.description}>
             {DIAGNOSIS_CONTENT[diagnosis ?? '']?.sources ?? ''}
           </Text>
-
-          <Text style={styles.disclaimer}>
-            <Text style={styles.disclaimerBold}>Disclaimer: </Text>
-            This assessment does not constitute medical, psychological, or
-            professional educational advice. Results are derived from a
-            self-reported survey and do not represent a clinical diagnosis
-            by a licensed physician, psychologist, or educational specialist.
-          </Text>
         </View>
 
         <View style={styles.rightColumn}>
             <Text style={styles.title}>Prescription</Text>
-            <Text style={styles.subtitle}>Recommended Practice</Text>
+            <Text style={styles.subtitle}>Recommended Tools</Text>
 
           {linkSections.map((section, sIndex) => (
             <View key={sIndex} style={styles.cardOutline}>
@@ -71,9 +63,6 @@ export default function Diagnosis() {
               ))}
             </View>
           ))}
-
-            <Text style={styles.subtitle}>Additional Tools</Text>
-
           {tips.map((tip, index) => (
             <View key={index} style={styles.card}>
               <Text style={styles.cardTitle}>{tip.title}</Text>
@@ -82,6 +71,14 @@ export default function Diagnosis() {
           ))}
         </View>
       </View>
+
+      <Text style={styles.disclaimer}>
+        <Text style={styles.disclaimerBold}>Disclaimer: </Text>
+        This assessment does not constitute medical, psychological, or
+        professional educational advice. Results are derived from a
+        self-reported survey and do not represent a clinical diagnosis
+        by a licensed physician, psychologist, or educational specialist.
+      </Text>
 
       <HoverScaleButton
         style={styles.button}
@@ -182,9 +179,10 @@ const desktopStyles = StyleSheet.create({
   disclaimer: {
     fontSize: 20,
     color: '#fff',
-    textAlign: 'left',
+    textAlign: 'center',
     marginTop: 20,
     lineHeight: 28,
+    paddingHorizontal: 300,
   },
   disclaimerBold: {
     fontWeight: 'bold',

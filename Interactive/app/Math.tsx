@@ -161,7 +161,16 @@ export default function MathScreen() {
         }
 
         const amount = COIN_VALUES[difficulty] ?? 0;
-        await supabase.rpc('increment_coins', { amount });
+        const { data: streakData, error: streakError } = await supabase.rpc('award_coins_with_streak', {
+          base_amount: amount,
+        });
+
+        if (streakError) {
+          console.error('award_coins_with_streak error:', streakError.message);
+        } else if (streakData && streakData[0]) {
+          setLastAward(streakData[0]);
+        }
+
         setCoinRefresh((prev) => prev + 1);
       }
       return;

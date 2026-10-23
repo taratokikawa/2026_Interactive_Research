@@ -3,21 +3,18 @@ import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Linking } from '
 import { supabase } from '../lib/supabase';
 import { useRouter } from 'expo-router';
 import HoverScaleButton from '../components/HoverScaleButton';
-
 type UserStat = {
   username: string;
   correct_count: number;
   incorrect_count: number;
   coins: number;
 };
-
 type TopQuestion = {
   question: string;
   difficulty: string;
   times_correct?: number;
   times_incorrect?: number;
 };
-
 type TutorRequestRow = {
   id: string;
   subject: string;
@@ -25,9 +22,10 @@ type TutorRequestRow = {
   proposed_start: string;
   proposed_end: string;
   status: string;
+  student_id: string;
+  learning_type: string | null;
   profiles: { username: string; email: string } | null;
 };
-
 export default function TeacherHub() {
   const [userStats, setUserStats] = useState<UserStat[]>([]);
   const [topCorrectMath, setTopCorrectMath] = useState<TopQuestion[]>([]);
@@ -41,9 +39,7 @@ export default function TeacherHub() {
   const [studentLimit, setStudentLimit] = useState(18);
   const [tutorRequests, setTutorRequests] = useState<TutorRequestRow[]>([]);
   const [tutorRequestLimit, setTutorRequestLimit] = useState(3);
-
   const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
-
   const formatReadable = (isoString: string) =>
     new Date(isoString).toLocaleString([], {
       weekday: 'short',
@@ -52,55 +48,66 @@ export default function TeacherHub() {
       hour: 'numeric',
       minute: '2-digit',
     });
-
   const formatGCalDate = (isoString: string) =>
     new Date(isoString).toISOString().replace(/[-:]|\.\d{3}/g, '');
-
   const buildGoogleCalendarUrl = (request: TutorRequestRow) => {
     const dates = `${formatGCalDate(request.proposed_start)}/${formatGCalDate(request.proposed_end)}`;
     const text = encodeURIComponent(`Tutoring: ${request.subject}`);
     const details = encodeURIComponent(request.details ?? '');
     const guest = request.profiles?.email ? `&add=${encodeURIComponent(request.profiles.email)}` : '';
-
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${dates}&details=${details}${guest}`;
+    return `https\://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${dates}&details=${details}${guest}`;
   };
-
   useEffect(() => {
     fetchTutorRequests();
   }, []);
-
   const fetchTutorRequests = async () => {
     const { data, error } = await supabase
       .from('tutor_requests')
       .select('*, profiles:student_id(username, email)')
       .order('created_at', { ascending: true });
-
     if (error) {
       console.error('fetchTutorRequests error:', error.message);
     }
-
-    setTutorRequests(data ?? []);
+    const requests = data ?? [];
+    const studentIds = [...new Set(requests.map((request) => request.student_id).filter(Boolean))];
+    let learningTypes: Record<string, string> = {};
+    if (studentIds.length > 0) {
+      const { data: surveyResults, error: surveyError } = await supabase
+        .from('learning_survey_results')
+        .select('user_id, diagnosis')
+        .in('user_id', studentIds);
+      if (surveyError) {
+        console.error('fetch learning survey results error:', surveyError.message);
+      } else {
+        learningTypes = Object.fromEntries(
+          (surveyResults ?? []).map((result) => [result.user_id, result.diagnosis])
+        );
+      }
+      console.log('Tutor request student IDs:', studentIds);
+      console.log('Survey query error:', surveyError);
+      console.log('Survey results:', surveyResults);
+    }
+    setTutorRequests(
+      requests.map((request) => ({
+        ...request,
+        learning_type: learningTypes[request.student_id] ?? null,
+      }))
+    );
   };
-
   const handleAccept = async (request: TutorRequestRow) => {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
-
     const { error } = await supabase
       .from('tutor_requests')
       .update({ status: 'accepted', teacher_id: userData.user.id })
       .eq('id', request.id);
-
     if (error) return;
-
     fetchTutorRequests();
     Linking.openURL(buildGoogleCalendarUrl(request));
   };
-
   useEffect(() => {
     fetchData();
   }, []);
-
   const fetchData = async () => {
     const [
     { data: stats },
@@ -117,7 +124,6 @@ export default function TeacherHub() {
     supabase.rpc('get_top_incorrect_english'),
     supabase.rpc('get_all_feedback'),
   ]);
-
     setUserStats(stats ?? []);
     setTopCorrectMath(correctMath ?? []);
     setTopIncorrectMath(incorrectMath ?? []);
@@ -127,7 +133,6 @@ export default function TeacherHub() {
     setLatestFeedback(feedbackData?.[0] ?? null);
     setLoading(false);
   };
-
   if (loading) {
     return (
       <View style={styles.container}>
@@ -135,7 +140,6 @@ export default function TeacherHub() {
       </View>
     );
   }
-
   const totalUsers = userStats.length;
   const avgCorrect = totalUsers > 0
     ? (userStats.reduce((sum, u) => sum + u.correct_count, 0) / totalUsers).toFixed(1)
@@ -146,7 +150,6 @@ export default function TeacherHub() {
   const avgCoins = totalUsers > 0
     ? (userStats.reduce((sum, u) => sum + u.coins, 0) / totalUsers).toFixed(1)
     : '0';
-
   const topCorrectUser = totalUsers > 0
     ? [...userStats].sort((a, b) => b.correct_count - a.correct_count)[0]
     : null;
@@ -156,10 +159,8 @@ export default function TeacherHub() {
   const topCoinsUser = totalUsers > 0
     ? [...userStats].sort((a, b) => b.coins - a.coins)[0]
     : null;
-
   const renderQuestionList = (title: string, questions: TopQuestion[], key: 'times_correct' | 'times_incorrect') => {
     const padded = [...questions, ...Array(Math.max(0, 3 - questions.length)).fill(null)];
-
     return (
       <View style={styles.halfColumn}>
         <Text style={styles.sectionTitle}>{title}</Text>
@@ -183,27 +184,22 @@ export default function TeacherHub() {
       </View>
     );
   };
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Teacher Hub</Text>
-
       <View style={styles.statsRow}>
         <View style={styles.leftColumn}>
         <View>
         <Text style={styles.sectionTitle}>Students ({userStats.length})</Text>
-
         <View style={styles.statsColumns}>
           {(() => {
             const visibleStats = userStats.slice(0, studentLimit);
             const perColumn = Math.ceil(visibleStats.length / 3);
-
             return [0, 1, 2].map((colIndex) => {
               const columnUsers = visibleStats.slice(
                 colIndex * perColumn,
                 (colIndex + 1) * perColumn
               );
-
               return (
                 <View key={colIndex} style={styles.statColumn}>
                   {columnUsers.map((u, index) => (
@@ -215,7 +211,6 @@ export default function TeacherHub() {
                       }
                     >
                       <Text style={styles.cardText}>{u.username}</Text>
-
                       <Text style={styles.cardSubText}>
                         Correct: {u.correct_count} | Incorrect: {u.incorrect_count} | Coins: {u.coins}
                       </Text>
@@ -226,7 +221,6 @@ export default function TeacherHub() {
             });
           })()}
         </View>
-
         {studentLimit < userStats.length && (
           <HoverScaleButton
             style={styles.showMoreButton}
@@ -237,8 +231,6 @@ export default function TeacherHub() {
         )}
       </View>
       </View>
-
-
         <View style={styles.rightColumn}>
         <View style={styles.averagesLeadersRow}>
           <View style={styles.averageColumn}>
@@ -256,7 +248,6 @@ export default function TeacherHub() {
               <Text style={styles.cardSubText}>{avgCoins} coins</Text>
             </View>
           </View>
-
           <View style={styles.leadersColumn}>
             <Text style={styles.sectionTitle}>Leaders</Text>
             <View style={styles.card}>
@@ -279,7 +270,6 @@ export default function TeacherHub() {
             </View>
           </View>
         </View>
-
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Feedback Forms ({allFeedback.length})</Text>
           <HoverScaleButton style={[styles.card, { height: 155 }]} onPress={() => router.push('/FeedbackDetail')}>
@@ -302,8 +292,7 @@ export default function TeacherHub() {
         </View>
       </View>
       </View>
-      
-      <Text style={styles.sectionTitle}>Tutor Requests</Text>
+      <Text style={styles.sectionTitle}>Tutor Requests ({tutorRequests.length})</Text>
         {tutorRequests.length === 0 ? (
           <Text style={styles.cardText}>No pending requests</Text>
         ) : (
@@ -318,7 +307,9 @@ export default function TeacherHub() {
                   <Text style={styles.cardSubText}>End: {formatReadable(request.proposed_end)}</Text>
                   <Text style={styles.cardSubText}>From: {request.profiles?.username}</Text>
                   <Text style={styles.cardSubText}>Email: {request.profiles?.email}</Text>
-
+                  <Text style={styles.cardSubText}>
+                    Learning Type: {request.learning_type ?? 'Not available'}
+                  </Text>
                   {request.status === 'pending' && (
                     <HoverScaleButton style={styles.showMoreButton} onPress={() => handleAccept(request)}>
                       <Text style={styles.showMoreText}>Accept</Text>
@@ -327,7 +318,6 @@ export default function TeacherHub() {
                 </View>
               ))}
             </View>
-
             {tutorRequestLimit < tutorRequests.length && (
               <HoverScaleButton
                 style={styles.showMoreButton}
@@ -338,13 +328,11 @@ export default function TeacherHub() {
             )}
           </>
         )}
-      
       <Text style={styles.sectionTitle}>Math</Text>
       <View style={styles.pairRow}>
         {renderQuestionList('Top 3 Correct', topCorrectMath, 'times_correct')}
         {renderQuestionList('Top 3 Incorrect', topIncorrectMath, 'times_incorrect')}
       </View>
-
       <Text style={styles.sectionTitle}>English</Text>
       <View style={styles.pairRow}>
         {renderQuestionList('Top 3 Correct', topCorrectEnglish, 'times_correct')}
@@ -353,7 +341,6 @@ export default function TeacherHub() {
     </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,

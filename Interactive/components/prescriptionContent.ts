@@ -17,6 +17,10 @@ export const PRESCRIPTION_CONTENT: Record<string, PrescriptionTip[]> = {
     title: 'Natural Reader',
     explanation: 'Converts written notes, PDFs, and text into spoken audio, making written material more accessible through listening.',
   },
+  {
+    title: 'Youtube',
+      explanation: 'Math: The Organic Chemistry Tutor, English: Course Hero, History: Crash Course, Heimler\'s History, Science: Crash Course, Professor Dave Explains.',
+  },
 ],
 
   Visual: [
@@ -32,6 +36,10 @@ export const PRESCRIPTION_CONTENT: Record<string, PrescriptionTip[]> = {
     title: 'Canva',
     explanation: 'Allows students to create mind maps, infographics, graphic organizers, etc, helping them organize and visualize information.',
   },
+  {
+    title: 'Youtube',
+      explanation: 'Math: The Organic Chemistry Tutor, English: Course Hero, History: Crash Course, Heimler\'s History, Science: Crash Course, Professor Dave Explains.',
+  },
 ],
 
   'Reading/Writing': [
@@ -46,6 +54,10 @@ export const PRESCRIPTION_CONTENT: Record<string, PrescriptionTip[]> = {
   {
     title: 'Written Flashcards',
     explanation: 'Helps reinforce key terms and concepts through repeated writing and review.',
+  },
+  {
+    title: 'Youtube',
+      explanation: 'Math: The Organic Chemistry Tutor, English: Course Hero, History: Crash Course, Heimler\'s History, Science: Crash Course, Professor Dave Explains.',
   },
 ],
 };

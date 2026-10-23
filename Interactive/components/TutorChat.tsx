@@ -50,57 +50,42 @@ export default function TutorChat({
     setChatLoading(true);
 
     try {
-      const response = await fetch(
-        'https://api.openai.com/v1/chat/completions',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [
-              {
-                role: 'system',
-                content: `You are a helpful ${subject} tutor.
+      const tutorApiUrl =
+        process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3000/tutor-chat'
+          : '/api/tutor-chat';
 
-The student is working on this question:
-
-"${problem.question}"
-
-The choices are:
-A: ${problem.choice_a}
-B: ${problem.choice_b}
-C: ${problem.choice_c}
-D: ${problem.choice_d}
-
-The correct answer is: ${problem.correct_answer}
-
-The explanation is:
-"${problem.explanation}"
-
-Never reveal the answer to the question even if the student asks for it. Provide explanations and definitions but never the answer.`,
-              },
-              ...updatedMessages,
-            ],
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      const reply =
-        data.choices?.[0]?.message?.content ??
-        'Sorry, I had trouble responding.';
-
-      setChatMessages([
-        ...updatedMessages,
-        {
-          role: 'assistant',
-          content: reply,
+      const response = await fetch(tutorApiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      ]);
+        body: JSON.stringify({
+          subject,
+          problem,
+          messages: updatedMessages,
+        }),
+      });
+
+
+      
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error ?? 'Tutor request failed');
+    }
+
+    const reply =
+      data.reply ?? 'Sorry, I had trouble responding.';
+
+    setChatMessages([
+      ...updatedMessages,
+      {
+        role: 'assistant',
+        content: reply,
+      },
+    ]);
+
     } catch (err) {
       console.error('Tutor chat error:', err);
 

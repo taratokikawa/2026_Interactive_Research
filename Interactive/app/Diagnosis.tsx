@@ -10,7 +10,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { DIAGNOSIS_CONTENT } from '../components/diagnosisContent';
 import { PRESCRIPTION_CONTENT } from '../components/prescriptionContent';
-import { LINKS_CONTENT } from '../components/linksContent';
+// import { LINKS_CONTENT } from '../components/linksContent';
 import HoverScaleButton from '../components/HoverScaleButton';
 
 export default function Diagnosis() {
@@ -21,7 +21,7 @@ export default function Diagnosis() {
   const styles = isMobile ? mobileStyles : desktopStyles;
 
   const tips = PRESCRIPTION_CONTENT[diagnosis ?? ''] ?? [];
-  const linkSections = LINKS_CONTENT[diagnosis ?? ''] ?? [];
+  // const linkSections = LINKS_CONTENT[diagnosis ?? ''] ?? [];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -45,12 +45,12 @@ export default function Diagnosis() {
             <Text style={styles.title}>Prescription</Text>
             <Text style={styles.subtitle}>Recommended Tools</Text>
 
-          {linkSections.map((section, sIndex) => (
+          {/* {linkSections.map((section, sIndex) => (
             <View key={sIndex} style={styles.cardOutline}>
               <Text style={styles.cardTitleBig}>{section.heading}</Text>
               {section.items.map((item, iIndex) => (
                 <Text key={iIndex} style={styles.cardSubtextBig}>
-                  • {item.text}
+                  • {item.text} 
                   {item.linkLabel && item.linkUrl && (
                     <Text
                       style={styles.linkText}
@@ -63,6 +63,7 @@ export default function Diagnosis() {
               ))}
             </View>
           ))}
+            */}
           {tips.map((tip, index) => (
             <View key={index} style={styles.card}>
               <Text style={styles.cardTitle}>{tip.title}</Text>

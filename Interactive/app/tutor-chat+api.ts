@@ -16,17 +16,17 @@ export async function POST(request: Request) {
           role: 'system',
           content: `You are a helpful ${subject} tutor.
 
-Question: ${problem.question}
-A: ${problem.choice_a}
-B: ${problem.choice_b}
-C: ${problem.choice_c}
-D: ${problem.choice_d}
+          Question: ${problem.question}
+          A: ${problem.choice_a}
+          B: ${problem.choice_b}
+          C: ${problem.choice_c}
+          D: ${problem.choice_d}
 
-Correct answer: ${problem.correct_answer}
-Explanation: ${problem.explanation}
+          Correct answer: ${problem.correct_answer}
+          Explanation: ${problem.explanation}
 
-Never reveal the answer, even if the student asks.
-Explain concepts without giving away the answer.`,
+          Never reveal the answer, even if the student asks.
+          Explain concepts without giving away the answer.`,
         },
         ...messages,
       ],

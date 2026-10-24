@@ -18,6 +18,10 @@ export const PRESCRIPTION_CONTENT: Record<string, PrescriptionTip[]> = {
     explanation: 'Converts written notes, PDFs, and text into spoken audio, making written material more accessible through listening.',
   },
   {
+    title: 'Khan Academy',
+    explanation: 'Provides spoken audio explanations and practice exercises for a wide range of subjects, supporting learning through listening.',
+  },
+  {
     title: 'Youtube',
       explanation: 'Math: The Organic Chemistry Tutor, English: Course Hero, History: Crash Course, Heimler\'s History, Science: Crash Course, Professor Dave Explains.',
   },
@@ -37,6 +41,10 @@ export const PRESCRIPTION_CONTENT: Record<string, PrescriptionTip[]> = {
     explanation: 'Allows students to create mind maps, infographics, graphic organizers, etc, helping them organize and visualize information.',
   },
   {
+    title: 'Khan Academy',
+    explanation: 'Provides visual explanations and practice exercises for a wide range of subjects, supporting learning through visualization.',
+  },
+  {
     title: 'Youtube',
       explanation: 'Math: The Organic Chemistry Tutor, English: Course Hero, History: Crash Course, Heimler\'s History, Science: Crash Course, Professor Dave Explains.',
   },
@@ -54,6 +62,10 @@ export const PRESCRIPTION_CONTENT: Record<string, PrescriptionTip[]> = {
   {
     title: 'Written Flashcards',
     explanation: 'Helps reinforce key terms and concepts through repeated writing and review.',
+  },
+  {
+    title: 'Khan Academy',
+    explanation: 'Provides written explanations and practice exercises for a wide range of subjects, supporting learning through reading and writing.',
   },
   {
     title: 'Youtube',
